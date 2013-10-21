@@ -50,7 +50,7 @@
 \usepackage{listings}
 \usepackage{color,colortbl}
 \usepackage{rccol}
-\usepackage[table]{xcolor}
+%\usepackage[table]{xcolor}
 
     \definecolor{listcomment}{rgb}{0.0,0.5,0.0}
     \definecolor{listkeyword}{rgb}{0.0,0.0,0.5}
@@ -150,7 +150,7 @@
 
 \begin{frontmatter}
 
-\title{Multivariate Neuroanalysis with ANTsR:  Application to Supervised Brain Segmentation with Concatenated Random Forests}
+\title{Multivariate Neuroanalysis with ANTsR: Application to Supervised Brain Tumor Segmentation using Random Forests}
 
 \author[label1]{Nicholas J.~Tustison
   \fnref{label0}}
@@ -158,8 +158,7 @@
   }
 \author[label2]{K.~L.~Shrinidhi}
 \author[label2]{Jeffrey T.~Duda}
-\author[label2]{Philip A.~Cook}
-\author[label1]{Christopher Durst}
+\author[label1]{Christopher R.~Durst}
 \author[label1]{Max Wintermark}
 \author[label1]{James C.~Gee}
 \author[label1]{Murray C.~Grossman}
@@ -179,19 +178,20 @@ brain---many of which
 have been made publicly available.  One such popular toolkit is the open source Advanced
 Normalization Tools (ANTs) which contains a suite of well-vetted processing tools for
 core data transformation tasks such as image registration, image segmentation, 
-inhomogeneity field correction and template building.  However, despite the numerous
-solutions afforded by such tools, neuroscience (and data analysis in general) requires
-a statistical platform for making inferences with respect to given hypotheses once the 
-requisite data transformations have been performed.  In this paper, we describe the
+inhomogeneity field correction, and template building.  However, despite the numerous
+solutions afforded by such packages, neuroscience (and data analysis in general) requires
+robust, statistical tools for making predictive inferences with respect to given hypotheses
+and for abstracting quantitative information to various graphical representations.  
+In this paper, we describe the
 coupling of ANTs with the widely-used R language---an open source environment for 
 statistical processing and data visualization---which we denote as ANTsR.  One of the
 many benefits from such an integration is the accessibility to advanced statistical 
 and machine learning techniques.  To showcase the flexibility and power of ANTsR, we 
-apply the combination of one such technique, Random Forests, and ANTs processing 
-tools to the difficult problem of brain tumor segmentation.  This includes evaluation on 
-the public data set from the MICCAI 2012 BRATS challenge consisting of both real and simulated
-data.  To facilitate reproducibility, all scripts and data used in this paper are 
-publicly available for download.  
+apply the combination of one well-known random forest R package  and ANTs processing 
+tools to the difficult problem of brain tumor segmentation from multi-modality
+MRI.  This algorithmic framework was the top-performing entry in the MICCAI 2013 Multimodal 
+Brain Tumor Segmentation (BRATS) challenge and, to our knowledge, is the only entry for
+both challenge years (2012, 2013) which has been made publicly available as open source.
 \end{abstract}
 
 \begin{keyword}
@@ -237,16 +237,13 @@ advanced normalization tools \sep BRATS \sep brain tumor segmentation \sep R pro
 
 ANTs (Advanced Normalization Tools) originated with the open source availing
 of state-of-the-art registration algorithms for neuroimage analysis
-\cite{avants2008a} built upon the mature and well-vetted Insight Toolkit
-of the National Institutes of Health.  Since then, the toolkit has grown to include 
+\cite{avants2008a} built upon the mature and well-vetted Insight Toolkit (ITK)
+of the National Institutes of Health.  Since then, ANTs has grown to include 
 several algorithmic solutions necessary
 for robust medical image analysis including bias correction \cite{tustison2010}, 
 $n$-tissue multivariate segmentation \cite{avants2011}, template construction \cite{avants2010}, 
 and cortical thickness estimation \cite{das2009} (many of which have been
-introduced into ITK partially in an attempted leveraging of Linus's Law).%
-\footnote{
-``Given enough eyeballs, all bugs are shallow.'' --Linus Torvalds
-}   
+introduced into ITK partially in an attempted leveraging of Linus's Law---``Given enough eyeballs, all bugs are shallow'').
 However, in the evolution of the toolkit, it became clear (as neuroimaging
 research certainly falls under the popular rubric of ``big data analysis'')
 that robust statistical machinery was lacking for proper inferences regarding
@@ -259,25 +256,85 @@ transformations and the R project%
 http://www.r-project.org
 }
 for statistical computing and visualization thus providing a complete
-set of tools for multivariate image analysis. 
+set of tools for multivariate neuroimage analysis. 
 
 In addition to describing ANTsR basics and how it can be generally
 used in multivariate neuroimaging studies, we showcase its use in
-a particularly salient application for performing supervised brain
+the particularly difficult application of performing supervised brain
 segmentation using random forests.  Although random forests have
-been proposed previously in the literature for supervised brain 
-segmentation (e.g. \cite{geremia2011,zikic2012}), we demonstrate that ANTsR
-significantly facilitates the construction of a fully functional, 
-parallelizable workflow for such a task and that performance 
-exceeds that of the top competitors in the recent Multimodal Brain
-Tumor Segmentation Challenge as part of the MICCAI 2012 conference.%
+been proposed previously in the literature for, among other things, 
+supervised brain segmentation (e.g. \cite{geremia2011,zikic2012}), 
+we demonstrate that ANTsR significantly facilitates the construction 
+of a fully functional, parallelizable workflow for such a task and 
+that the performance of our proposed framework was proven extremely 
+competitive in the recent MICCAI 2013 Multimodal Brain Tumor Segmentation
+Challenge (see Figure \ref{fig:award}).%
 \footnote{
-http://www2.imm.dtu.dk/projects/BRATS2012/  
+http://martinos.org/qtim/miccai2013/
 }
+\begin{figure}
+  \centering
+  \includegraphics[width=80mm]{Figures/award.pdf}
+  \caption{First place certificate from the MICCAI 2013 BRATS challenge.}
+  \label{fig:award}
+\end{figure}
+
+It is interesting to note that our participation in the 2013 challenge
+was the result of observing the 2012
+challenge, wanting to take advantage of the same methods as the winners,
+and finding that no teams had availed their software in any form.  As a 
+corrective \citep{ince2012}, and very much in line with our philosophy 
+regarding open science, we have made this framework available as open 
+source (even releasing the code before the actual 2013 contest).%
+\footnote{
+https://github.com/ntustison/BRATS2013
+}
+To our knowledge, we are the only competitors out of the 20 or so teams 
+that participated in either years' challenges to do this.
 
 \section{Materials and Methods}
 
 \subsection{ANTsR:  An ANTs/R Interface}
+
+\subsubsection{Overview}
+
+The quantitative complexity of neuroimaging research necessitates 
+commensurable numerical analysis capabilities.  Similarly, concomitant
+with the era of ``big data'' (and neuroimaging certainly qualifies
+\citep{vanhorn2013}) are new visualization changes 
+\citep{childs2013,kehrer2013}.
+In response, various software packages have been developed to
+integrate tools specific to neuroimaging research with numerical
+and visualization software packages.
+The well-known neuroimaging standard SPM%
+\footnote{
+http://www.fil.ion.ucl.ac.uk/spm/
+}
+is built as an add-on to the commercial computing and visualization environment
+Matlab.  Open source neuroimaging packages, such as NIPY (neuroimaging in Python),%
+\footnote{
+http://nipy.org
+} 
+rely on other open source packages for numerical/statistical analysis.  NIPY,
+for example, uses other open source python packages such as NumPy.%
+\footnote{
+http://www.numpy.org
+}  
+
+Careful consideration of available options
+led to the adoption of R to complement ANTs capabilities which resulted in the
+ANTsR package.
+The R project for statistical computing,%
+\footnote{
+www.r-project.org
+}
+ or more compactly
+`R', is an environment for statistical computation
+and data visualization.  R's open source code base
+and add-on packages coupled with its rapidly growing 
+community of developers and users has caused wide-scale
+adoption within both academia and industry.
+
 
 \subsubsection{Installation}
 
@@ -288,14 +345,15 @@ https://github.com/stnava/ANTsR
 Prior to installation of ANTsR, several external R packages
 need to be installed including: \verb#Rcpp#, \verb#signal#, \verb#timeSeries#, 
 \verb#mFilter#, \verb#doParallel#, \verb#robust#, \verb#magic#, \verb#knitr#, \verb#pixmap#, 
-\verb#rgl#, \verb#misc3d# which is facilitated by the 
+\verb#rgl#, \verb#misc3d# which is easily facilitated by the 
 \verb#install.packages()# mechanism.  Additionally, in order
 to perform the supervised brain segmentation as described 
 in later sections, one would need to also install 
 \verb#randomForest#, \verb#snowfall#, \verb#rlecuyer#,
 and \verb#ggplot2#. 
 
-CMake%
+In addition to R and relevant packages, CMake needs to also be
+installed.  CMake%
 \footnote{
 http://www.cmake.org/
 }
@@ -306,10 +364,10 @@ such as the Insight Toolkit (ITK)%
 \footnote{
 http://www.itk.org/
 }
-and ANTs.  Detailed instructions for download and
+and ANTs.  Further instructions for download and
 installation can be found on the ANTsR github website.
 
-\subsection{Supervised Brain Segmentation}
+\subsection{Supervised Brain Tumor Segmentation}
 
 Given a set of training data consisting of 
 labeled (csf, gray matter, white matter, edema, and tumor),
