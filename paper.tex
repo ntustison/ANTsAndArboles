@@ -150,7 +150,7 @@
 
 \begin{frontmatter}
 
-\title{Multivariate Neuroanalysis with ANTsR: Application to Supervised Brain Tumor Segmentation using Random Forests}
+\title{Multivariate Neuroimage Analysis with ANTsR: Application to Supervised Brain Tumor Segmentation using Random Forests}
 
 \author[label1]{Nicholas J.~Tustison
   \fnref{label0}}
@@ -242,7 +242,7 @@ advanced normalization tools \sep BRATS \sep brain tumor segmentation \sep R pro
 
 ANTs (Advanced Normalization Tools) originated with the open source availing
 of high-performance registration algorithms for neuroimage analysis
-\citep{avants2008a} built upon the mature and well-vetted Insight Toolkit (ITK)
+\citep{avants2008a} built upon the mature Insight Toolkit (ITK)
 of the National Institutes of Health.  Since then, ANTs has grown to include 
 several algorithmic solutions for robust medical image analysis including bias 
 correction \citep{tustison2010}, $n$-tissue multivariate segmentation 
@@ -261,16 +261,17 @@ http://www.r-project.org
 for statistical computing and visualization thus providing a complete
 set of tools for multivariate neuroimage analysis. 
 
-In addition to describing ANTsR basics and how it can be
-used generally in multivariate neuroimaging studies, we showcase its use in
+%In addition to describing ANTsR basics and how it can be
+%used generally in multivariate neuroimaging studies, 
+We showcase ANTsR with
 the particularly difficult application of supervised brain tumor
-segmentation \cite{bauer2013} for which we use the widely popular 
+segmentation \citep{bauer2013} for which we use the increasingly popular 
 random forests machine learning technique.  Although random forests have
 been proposed previously in the literature for, among other things, 
 supervised brain segmentation (e.g. \cite{geremia2011}), 
 we demonstrate that ANTsR significantly facilitates the construction 
 of a fully functional, parallelizable workflow for such a task and 
-that the performance of our proposed framework has proven extremely in 
+that the performance of our proposed framework has proven extremely effective in 
 actual practice, specifically
  in the recent MICCAI 2013 Multimodal Brain Tumor Segmentation
 Challenge (see Figure \ref{fig:award}).%
@@ -330,13 +331,14 @@ http://www.numpy.org
 Careful consideration of available options
 led to the adoption of R to complement ANTs capabilities resulting in the
 ANTsR package.
-The R project for statistical computing,%
-\footnote{
-www.r-project.org
-}
- or more compactly
-`R', is an environment for statistical computation
-and data visualization.  R's open source code base
+%The R project for statistical computing,%
+%\footnote{
+%www.r-project.org
+%}
+% or more compactly
+%`R', is an environment for statistical computation
+%and data visualization.  
+R's open source code base
 and add-on packages coupled with its rapidly growing 
 community of developers and users has caused wide-scale
 adoption within both academia and industry.
@@ -398,7 +400,7 @@ https://github.com/ntustison/ANTsAndArboles
 }
 Also, we posted all
 scripts (R, shell, and perl) used to coordinate the ANTsR processing 
-including (along with a brief description of each script):
+including:
 \begin{itemize}
   \item {\tt applyModel.R}:  applies a random forest model to a new 
   feature data set from a testing subject resulting in a set of probability
@@ -413,11 +415,11 @@ including (along with a brief description of each script):
   file names in a csv file for input into {\tt applyModel.R}.
   \item {\tt createFeatureImages.sh};  creates the set of feature images given
   a set of co-registered input MRI from a single subject. 
-  \item {\tt createModel.R}:  creates random forest model given the input csv 
+  \item {\tt createModel.R}:  creates a random forest model given the input csv 
   file of the feature image file names for all training data and set of truth
   label maps.
   \item {\tt plotVariableImportance.R}:  produces a plot of the importance 
-  (`{\tt MeanDecreaseAccuracy}') of each feature variable used 
+  ({\tt MeanDecreaseAccuracy}) of each feature variable used 
   in constructing the model.
 \end{itemize}
 We also include a fully functional 2-D example which performs
@@ -513,7 +515,8 @@ Challenge on Multimodal Brain Tumor Segmentation%
 \footnote{
 http://martinos.org/qtim/miccai2013/index.html
 }
-organized by K. Farahani, M. Reyes,B. Menze, E. Gerstner, J. Kirby and J. Kalpathy-Cramer. The challenge database contains fully anonymized images from the following institutions: 
+organized by K. Farahani, M. Reyes, B. Menze, E. Gerstner, J. Kirby and J. Kalpathy-Cramer. 
+The challenge database contains fully anonymized images from the following institutions: 
 ETH Zurich, University of Bern, University of Debrecen, and University of Utah and 
 publicly available images from the Cancer Imaging Archive (TCIA).  Both training 
 and testing data were made freely available through the Creative Commons Attribution-NonCommercial 3.0 license.
@@ -787,21 +790,29 @@ the template difference image is calculated by subtracting the warped template
 image from the corresponding modality of the subject.
 
 \paragraph{Miscellaneous Feature Images}
-Two additional feature images are calculated which seem to aid in 
+Three additional feature images are calculated which seem to aid in 
 classification as measured by the random forest variable importance
 (relative importance plots are provided in the Results section).
 First, the binary mask image is used to calculate the distance image 
 \citep{maurer2003}.  Second, from the symmetric template deformation 
 mapping we calculate the log Jacobian image.  Related to the earlier
 distance feature image, we calculate the distance mask image of the symmetric
-template and then warp that distance image to the individual subject.
+template and then warp that distance image to the individual subject
+for a third feature image.
 
 \subsubsection{Training:  Random Forest Model Creation}
 
 For use with the Challenge and Leaderboard data, cohort-specific models (both 
 low-grade and 
 high-grade glioma) for both GMM and MAP-MRF stages were created using only the 
-supplied training data.  Initial testing of our proposed framework was performed 
+supplied training data.  Prior to training, we segmented normal brain tissue \cite{avants2011}
+for each data set by segmenting only the T1 image.  This was only to yield
+a rough estimate of normal brain tissue to augment the already provided 
+pathology labels.  This resulted in seven labels (csf, gray matter, white matter,
+necrosis, edema, enhancing, and non-enhancing tumor)
+characterizing each brain.
+
+Initial testing of our proposed framework was performed 
 on the training data using a leave-one-out strategy.  Once the
 feature images are created for each subject, the resulting images of the entire
 training cohort are organized in a csv file for input into the R script
@@ -810,7 +821,7 @@ number of trees, number of samples per label, and number of threads for parallel
 processing.  The output is an {\tt RData} file describing the random forest
 model which can be used for future predictions.
  
-Additionally, the {\tt randomForest} package provides a couple measurements 
+Additionally, the {\tt randomForest} package provides  measurements 
 for determining the importance of chosen features when constructing the model.  
 This aids in potential feature pruning or intuiting model behavior.  As mentioned
 earlier, we provide the R script {\tt plotVariableImportance.R} to render
@@ -971,8 +982,7 @@ larger software package that we have created in ANTsR.  Not only does
 ANTsR significantly facilitate the development of the work discussed,
 but it provides an interface to one of the most powerful statistical
 packages available in R.  The combination of the well-known ANTs software
-package with R provides tremendous potential for future insightful analyses 
-and graphical displays.
+package with R provides tremendous potential for future insightful analysis.
 
 
 
