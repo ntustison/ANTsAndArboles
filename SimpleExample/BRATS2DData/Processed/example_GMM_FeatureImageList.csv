@@ -1,0 +1,6 @@
+TRUTH_LABELS,MASK,
+.//BRATS2DData//TrainingData//BRATS_HG0001/BRATS_HG0001_atropos_truth_slice90.nii.gz,.//BRATS2DData//TrainingData//BRATS_HG0001/BRATS_HG0001_MASK_slice90.nii.gz
+.//BRATS2DData//TrainingData//BRATS_HG0002/BRATS_HG0002_atropos_truth_slice90.nii.gz,.//BRATS2DData//TrainingData//BRATS_HG0002/BRATS_HG0002_MASK_slice90.nii.gz
+.//BRATS2DData//TrainingData//BRATS_HG0003/BRATS_HG0003_atropos_truth_slice95.nii.gz,.//BRATS2DData//TrainingData//BRATS_HG0003/BRATS_HG0003_MASK_slice95.nii.gz
+.//BRATS2DData//TrainingData//BRATS_HG0004/BRATS_HG0004_atropos_truth_slice94.nii.gz,.//BRATS2DData//TrainingData//BRATS_HG0004/BRATS_HG0004_MASK_slice94.nii.gz
+.//BRATS2DData//TrainingData//BRATS_HG0005/BRATS_HG0005_atropos_truth_slice95.nii.gz,.//BRATS2DData//TrainingData//BRATS_HG0005/BRATS_HG0005_MASK_slice95.nii.gz

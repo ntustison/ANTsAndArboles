@@ -22,7 +22,7 @@
 %% $URL: http://lenova.river-valley.com/svn/elsbst/trunk/elsarticle-template-1-num.tex $
 %%
 
-%\documentclass[preprint,authoryear,review,12pt]{elsarticle}
+% \documentclass[preprint,authoryear,review,12pt]{elsarticle}
 \documentclass[final,5p,times,twocolumn]{elsarticle}
 
 %% Use the option review to obtain double line spacing
@@ -157,19 +157,21 @@
   \fntext[label0]{\scriptsize Corresponding author:  PO Box 801339, Charlottesville, VA 22908; T:  434-924-7730; email address:  ntustison@virginia.edu.
   }
 \author[label2]{K.~L.~Shrinidhi}
-\author[label2]{Jeffrey T.~Duda}
-\author[label1]{Christopher R.~Durst}
 \author[label1]{Max Wintermark}
+\author[label1]{Christopher R.~Durst}
+\author[label2]{Jeffrey T.~Duda}
 \author[label1]{James C.~Gee}
-\author[label1]{Murray C.~Grossman}
+\author[label3]{Murray C.~Grossman}
 \author[label2]{Brian B.~Avants}
 \address[label1]{Department of Radiology and Medical Imaging, University of Virginia, Charlottesville, VA}
-\address[label2]{Penn Image Computing and Science Laboratory, University of Pennsylvania,
+\address[label2]{Penn Image Computing and Science Laboratory, 
+                 Department of Radiology, University of Pennsylvania,
+                Philadelphia, PA}
+\address[label3]{Department of Neurology, University of Pennsylvania,
                 Philadelphia, PA}
 
 %\maketitle
 
-\linenumbers
 
 \begin{abstract} 
 Improvements in image acquisition and increasingly sophisticated statistical techniques 
@@ -201,6 +203,8 @@ advanced normalization tools \sep BRATS \sep brain tumor segmentation \sep R pro
 \end{keyword}
 
 \end{frontmatter}
+%\linenumbers
+
 %
 %
 \newpage
@@ -275,7 +279,7 @@ http://martinos.org/qtim/miccai2013/
 }
 \begin{figure}
   \centering
-  \includegraphics[width=80mm]{Figures/award.pdf}
+  \includegraphics[width=90mm]{Figures/award.pdf}
   \caption{First place certificate from the MICCAI 2013 BRATS challenge.}
   \label{fig:award}
 \end{figure}
@@ -352,7 +356,7 @@ in later sections, one needs to also install the packages
 \verb#randomForest#, \verb#snowfall#, \verb#rlecuyer#,
 and \verb#ggplot2#.%
 \footnote{
-Packages are easily installed using the {\tt install.packages()} R function.
+Packages are easily installed using the {\tt install.packages()} R mechanism.
 } 
 
 In addition to R and the add-on packages previously mentioned, CMake is also 
@@ -384,10 +388,45 @@ The user help menu and documentation for the library  and its
 constituent functions are invoked in the similar manner as other
 R libraries.
 
+As mentioned earlier, we have made this entire framework
+available as open source.  In addition to the ANTsR repository
+already on github which houses both ANTs and ANTsR functionality, 
+we created a special github repository specifically for this work
+containing figures, references, and text.%
+\footnote{
+https://github.com/ntustison/ANTsAndArboles
+}
+Also, we posted all
+scripts (R, shell, and perl) used to coordinate the ANTsR processing 
+including (along with a brief description of each script):
+\begin{itemize}
+  \item {\tt applyModel.R}:  applies a random forest model to a new 
+  feature data set from a testing subject resulting in a set of probability
+  images (one for each label).
+  \item {\tt applyTumorSegmentationModel.sh}:  generates the new feature image set 
+  from the testing MRI (by calling {\tt createFeatureImages.sh}).
+  organizes the file names in a csv file (via {\tt createCSVFileFromModel.R}),
+  and applies the random forest model using {\tt applyModel.R}. 
+  \item {\tt applyTumorSegmentationModelForCohort.pl}:  Coordinates tumor 
+  segmentation on the computational cluster for a given cohort.
+  \item {\tt createCSVFileFromModel.R}:  organizes the set of feature image
+  file names in a csv file for input into {\tt applyModel.R}.
+  \item {\tt createFeatureImages.sh};  creates the set of feature images given
+  a set of co-registered input MRI from a single subject. 
+  \item {\tt createModel.R}:  creates random forest model given the input csv 
+  file of the feature image file names for all training data and set of truth
+  label maps.
+  \item {\tt plotVariableImportance.R}:  produces a plot of the importance 
+  (`{\tt MeanDecreaseAccuracy}') of each feature variable used 
+  in constructing the model.
+\end{itemize}
+We also include a fully functional 2-D example which performs
+both testing and training on sample challenge data.  
+
 \subsection{Supervised Brain Tumor Segmentation with Random Forests}
 
 Supervised techniques generally consist of a training phase
-for model construction followed by prediction using the previously
+for model construction followed by prediction using the 
 generated model.  For supervised brain tumor segmentation, 
 a set of training data consisting of labeled brain images 
 (e.g. csf, gray matter, white matter, 
@@ -397,25 +436,6 @@ classification techniques have been used to segment
 brain tumors (e.g. support vector machines \citep{bauer2011}),
 random forest models have proven particularly successful.
 
-In subsequent sections, we detail the generic
-random forest modeling framework which takes as input
-a set of feature images (also described in a later section)
-and labels for each training subject 
-and outputs a statistical model.  This model, in turn, can then
-be used to provide a probabilistic estimate of the labels in an
-unlabeled subject. 
-
-%One of the core extensions that we provide in this work is
-%the use of concatenated random forests for improved probabilistic estimation
-%of the labels.
-%As we demonstrate in the Results section, the set of feature
-%images employed work sufficiently well for good performance
-%on the training data.  However, we discovered
-%that further improvements could be gained by using the probabilistic 
-%label estimates as input to enhance preprocessing before a 
-%second round of feature image generation including 
-%modality-specific, prior-based $n$-tissue segmentation and 
-%random forest model creation. 
 
 Several machine learning concepts were integrated to create 
 the random forests framework first articulated in its entirety by Breiman
@@ -429,7 +449,15 @@ classification/regression performance \cite{ho1995,amit1997}.
 The final element of bootstrap aggregating or ``bagging'' (i.e.
 random sampling of the training data) was
 introduced by Breiman \cite{breiman1996} to achieve improved
-accuracy.  
+accuracy.%
+\footnote{
+One of the principal advantages of R is the extensive community of
+developers  who have contributed on the order of thousands of packages 
+extending R's capabilities beyond its core functionality.
+Most relevant 
+is the {\tt randomForest} package developed from Breiman's original
+Fortran code by Liaw and Wiener \citep{liaw2002}.
+}
 
 Early adoption \cite{viola2005} and success in the
 computer vision community
@@ -446,12 +474,36 @@ A thorough introduction for those interested in delving deeper
 into the more theoretical aspects of random forests can be found
 in \cite{criminisi2011}.
 
-One of the principal advantages of R is the extensive community of
-developers  who have contributed on the order of thousands of packages 
-extending R's capabilities beyond its core functionality.
-Most relevant for the work described in this paper
-is the \verb#randomForest# package developed from Breiman's original
-Fortran code by Liaw and Wiener \citep{liaw2002}.
+%In subsequent sections, we detail the generic
+%random forest modeling framework which takes as input
+%a set of feature images (also described in a later section)
+%and labels for each training subject 
+%and outputs a statistical model.  This model, in turn, can then
+%be used to provide a probabilistic estimate of the labels in an
+%unlabeled subject. 
+
+One of the innovations that we provide in this work is
+the use of concatenated random forests for improved probabilistic estimation
+of the brain segmentation labels.  Briefly, Gaussian mixture
+modeling (GMM) is used to create a subset of feature images which are
+used to train and predict during the first classification stage.  
+The random forest voting output probabilistic maps are then used as 
+spatial probability priors for performing a MAP-MRF segmentation
+and subsequent feature image creation
+thereby replacing the GMM-derived feature images for a second
+classification stage.  This dual random forest model generation
+and application
+improves results and is detailed in later sections.
+
+%As we demonstrate in the Results section, the set of feature
+%images employed work sufficiently well for good performance
+%on the training data.  However, we discovered
+%that further improvements could be gained by using the probabilistic 
+%label estimates as input to enhance preprocessing before a 
+%second round of feature image generation including 
+%modality-specific, prior-based $n$-tissue segmentation and 
+%random forest model creation. 
+
 
 
 \subsubsection{Brain Tumor Data}
@@ -472,7 +524,7 @@ and with and without resection).  For each subject, the T1, T2, and
 FLAIR MRI were linearly registered to the post-contrast T1.  Subsequently,
 the brains were skull-stripped and resampled to 1 mm isotropic resolution.
 Testing data was processed similarly and released during the course of the
-challenge in two sets denoted as ``LeaderBoard'' and ``Challenge'' data.  
+challenge in two sets denoted as ``Leaderboard'' and ``Challenge'' data.  
 The former consisted of 21 and 4 high and low-grade tumor patients, respectively,
 whereas the latter comprised 10 high-grade only patients.
 
@@ -590,56 +642,41 @@ Figure \ref{fig:symmetrictemplates} we show mid-axial slices from
 the Kirby multivariate symmetrical template consisting of FA, FLAIR,  
 T1, and T2 components.  Although DTI-based images were not included in the
 challenge data, such images have shown discriminative potential 
-\citep{price2003} to warrant investigation in our future work.
+\citep[e.g.][]{price2003} to warrant investigation in our future work.
 
 \subsubsection{Multi-Modal Feature Image Generation}
 
 \begin{figure*}
   \centering
+  \makebox[\textwidth][c]{
   \includegraphics[width=180mm]{Figures/featureImages.pdf}
-  \caption{Representative feature images derived from the BRATS\_HG0301 ``challenge'' data set.
-           Neighborhood statistical images for each modality were generated by calculating a 
-           given statistic within
+  }
+  \caption{Representative feature images derived from the 
+           BRATS\_HG0301  ``challenge'' data set.
+           Neighborhood statistical images for each modality were 
+           generated by calculating a given statistic within
            a specified neighborhood radius.  Also calculated for each modality were feature
            images based on either the GMM or the MAP-MRF segmentation.  For the former, we
            show the probability maps for each of the seven labels which are used as feature
            images.  From the resulting hard segmentation, we calculate various geometric 
            measures per connected component of each of the seven labels.  Similarly, the 
-           registration to the symmetric template produces the modality-specific difference images with the
-           corresponding symmetric template itself and with respect to the contralateral side.   
-           This mapping is also used to produce the log Jacobian image.  Finally, the T1 - TC image
-           is calculated and, from the
+           registration to the symmetric template produces the modality-specific 
+           difference images with the
+           corresponding symmetric template itself and with respect to the 
+           contralateral side.   
+           This mapping is also used to produce the log Jacobian image.  Finally, the 
+           (T1 - TC) image is calculated and, from the
            cerebral mask, we calculate the normalized distance image.  
            }
+  \label{fig:featureImages}         
 \end{figure*}
 
-The workflow for estimating tumor-based labeling from multi-modal 
-images involves the following steps:
-\begin{enumerate}
-  \item Symmetric multivariate template construction \cite{avants2010}
- using the data described in \cite{landman2011}.
-  \item Image preprocessing:
-    \begin{itemize}
-      \item Windowing intensities (quantiles $[0.01,0.99]$).
-      \item N4 bias correction \cite{tustison2010}.
-      \item Rescaling intensity range to $[0,1]$.  
-    \end{itemize}
-  \item Stage 1 (GMM) processing:
-  \begin{itemize}
-    \item generation of feature images,
-    \item construction of the Stage 1 RF model and probability images.
-  \end{itemize}
-  \item Stage 2 processing:
-  \begin{itemize}
-    \item generation of single-modality MAP-MRF images using the Stage 1 RF probability images as spatial priors,
-    \item construction of the Stage 2 RF model and labelings.
-  \end{itemize}
-  \item Refinement of Stage 2 labelings using a heuristically-derived binary morphological processing protocol.
-\end{enumerate}
-
+%For both training and prediction protocols, feature images are generated
+%for each subject using the selected input MRI.  
 Key to any supervised regression or classification protocol are the 
 selected features for training and subsequent prediction.  Based on previous
-work and our own experience, the following feature images were selected:
+work and our own experience, the following feature images are generated
+for use in both training and prediction:
 \begin{itemize}
   \item Per modality (FLAIR, T1, T1C, T2)
     \begin{itemize}
@@ -655,29 +692,30 @@ work and our own experience, the following feature images were selected:
           contralateral difference with Gaussian smoothing ($\sigma = 4$mm).
     \end{itemize}
   \item Miscellaneous: normalized Euclidean distance based on cerebral mask,
-    log Jacobian image, and  (T1C - T1) difference image.
+    log Jacobian image, and  (T1 - T1C) difference image.
 \end{itemize}
+The generation of all feature images is performed using the available script 
+{\tt createFeatureImages.sh} which also preprocesses the input images performing N4
+bias correction \citep{tustison2010} and intensity rescaling to $[0,1]$.  Note that 
+it is easily expandable to include 
+additional modalities and/or neighborhood and smoothing parameters.
+In Figure \ref{fig:featureImages}
+we provide sample mid-axial slices from the BRATS\_HG0301
+data set from the Challenge cohort.  
+
+We previously mentioned that all data was provided already 
+skull-stripped.  However, we note to the reader that an
+available ANTs-based solution to the brain extraction problem
+is found in the script {\tt antsBrainExtraction.sh} which uses
+a hybrid approach based on image registration and binary morphology
+to isolate the brain \cite{avants2010a}.  We recently performed an evaluation of over 1200
+MRI which demonstrated perfect performance \cite{tustison2013a}.
 
 
-
-
-
-
-For each modality, we create four first-order statistical feature images,
-five Gaussian mixture model (GMM)-based posterior probability feature images,
-four geometry features generated from the GMM posterior probability images
-based on connected components, and two difference images using symmetric template
-construction for a total of 4 modalities $\times$ (4 + 5 + 4 + 2) feature images per modality $=$ 60 total
-feature images.  We employ two additional images consisting of the 
-Euclidean distance image \cite{maurer2003} created from the skull-stripped 
-binary mask rescaled to the range $[0,1]$ and the log
-Jacobian image derived from the spatial normalization of the symmetric multivariate template and individual subject images.  Given the intensity corrected images
-the corresponding multivariate template images, and a brain mask for each subject
-creation of all feature images is performed using the script \verb#createFeatureImages.sh#.
-
-Prior  cluster centers for specific tissue types learned from training data \cite{reynolds2009} are used in the GMM to create multiple feature images.  
-Given $M$ tissue types (e.g. CSF, gray matter,
-white matter, edema, and tumor), a GMM formulates the 
+\paragraph{Stage 1 (GMM)}
+Prior  cluster centers for specific tissue types learned from training data \citep{reynolds2009} are used in the GMM random forest stage to create 
+multiple feature images.  
+Given $M$ tissue types, a GMM formulates the 
 probability distribution at each voxel, $\mathbf{x}$, as the
 sum of Gaussian components, $\mathcal{N}(\mathbf{x}|\mu,\sigma)$, i.e.
 \begin{align}
@@ -686,36 +724,115 @@ p\left(\mathbf{x}|\mu_m,\sigma_m,\lambda_m\right) = \sum_{i=1}^M \lambda_m \math
 where $\sum_{m=1}^M \lambda_m = 1$.  One popular method for 
 determining the parameters of the GMM is maximum likelihood 
 estimation which can performed using the Atropos segmentation 
-tool \cite{avants2011}.  In contrast to previous generative
+tool \citep{avants2011} available in ANTs.  
+
+\paragraph{Stage 2 (MAP-MRF):}
+
+Prediction during the GMM stage results in a set of random 
+forest voting classification maps giving a probabilistic estimate
+of the label value at each voxel.  These spatial probability
+maps can be used as spatial priors in a MAP-MRF segmentation
+estimation protocol also performed using the Atropos segmentation 
+tool \citep{avants2011} available in ANTs although we couple
+it with iterative bias correction as contained in the script
+{\tt antsAtroposN4.sh}.  The probabilistic output (and corresponding
+feature images) 
+for each modality are used to replace the analogous GMM-based feature images used 
+during the first stage of prediction along with the other feature
+images previously generated (such as the template-based data).
+We discovered that this composite application of random
+forest models improves the resulting labeled output.
+
+For both stages, in contrast to previous generative
 modeling approaches for multi-modal tumor segmentation 
-(e.g. \cite{prastawa2003}), we do not use multivariate 
+\citep[e.g.][]{prastawa2003}, we do not use multivariate 
 Gaussians to specify tissue probabilities but rather incorporate each
 univariate probability map into the feature vector of the training
 data.  As pointed out in \cite{menze2010}, multivariate modeling
 might obscure the distinct biological information provided by each 
 modality.  Instead, we let the random forest construction 
 process determine the optimal combination of such multivariate
-information.
-Additionally, maximum posterior labeling from the GMM processing
+information.  Additionally, maximum posterior labeling from both stages
 is used to determine the connected components for each label.  
 Geometric features (assigned voxel-wise) include the physical volumes 
-of each connected component including the volume to surface area ratio, 
+of each connected component, the volume to surface area ratio, 
 the elongation, and eccentricity. 
 
+\paragraph{Neighborhood First-Order Statistic Feature Images}
+Similar to other work \cite{bauer2012,zikic2012} we calculated
+feature images using first order statistics such as mean, 
+variance, skewness, and entropy.  Images were created for 
+neighborhood radii of 1 and 3 voxels.
 
+\paragraph{Template-based Feature Images}
+Additional feature images are derived from the multivariate 
+symmetric template described earlier. The T1 images of the 
+subject and symmetric template are co-registered 
+\citep{tustison2013a} using the {\tt antsRegistration} 
+tool.  The motivation is similar in spirit to the method
+using reflection about the mid-sagittal plane described in 
+\cite{geremia2012}.  However, tumor growth often causes 
+distortion of the mid-plane thereby limiting the accuracy of
+this method.  By mapping to the symmetric template using the
+highly accurate SyN algorithm \cite{avants2011a}, we can 
+account for any distortion for comparing contralateral
+sides.
+
+Two images per modality use this derived mapping.  The modality-specific
+contralateral difference feature image is calculated by transforming
+the image to the symmetric template, flipping the image contralaterally,
+then transforming it back using the inverse transform, and subtracting
+the corresponding template component from the original image.  Additionally, 
+the template difference image is calculated by subtracting the warped template 
+image from the corresponding modality of the subject.
+
+\paragraph{Miscellaneous Feature Images}
+Two additional feature images are calculated which seem to aid in 
+classification as measured by the random forest variable importance
+(relative importance plots are provided in the Results section).
+First, the binary mask image is used to calculate the distance image 
+\citep{maurer2003}.  Second, from the symmetric template deformation 
+mapping we calculate the log Jacobian image.  Related to the earlier
+distance feature image, we calculate the distance mask image of the symmetric
+template and then warp that distance image to the individual subject.
 
 \subsubsection{Training:  Random Forest Model Creation}
 
-\subsubsection{Prediction:  Applying Random Forest Models}
+For use with the Challenge and Leaderboard data, cohort-specific models (both 
+low-grade and 
+high-grade glioma) for both GMM and MAP-MRF stages were created using only the 
+supplied training data.  Initial testing of our proposed framework was performed 
+on the training data using a leave-one-out strategy.  Once the
+feature images are created for each subject, the resulting images of the entire
+training cohort are organized in a csv file for input into the R script
+{\tt createModel.R}.  Other possible input parameters include the requested 
+number of trees, number of samples per label, and number of threads for parallel
+processing.  The output is an {\tt RData} file describing the random forest
+model which can be used for future predictions.
+ 
+Additionally, the {\tt randomForest} package provides a couple measurements 
+for determining the importance of chosen features when constructing the model.  
+This aids in potential feature pruning or intuiting model behavior.  As mentioned
+earlier, we provide the R script {\tt plotVariableImportance.R} to render
+one such quantity denoted as {\tt MeanDecreaseAccuracy}.  During model construction
+(specifically the out-of-bag error calculation stage), the decrease in prediction accuracy
+with the omission of a single feature or variable is tracked and averaged.  Thus,
+those features which have the greatest decrease in mean accuracy are considered
+to be the most discriminative.%
+\footnote{
+There is an issue with consistently ranking correlated predictors as described at {\tt http://www.r-bloggers.com/random-forest-variable-importance/} since the permutation testing performed for predictive accuracy assessment assumes predictor independence.  Correctives have been proposed but we ignore these issues for this particular application.
+}
+
+\subsubsection{Prediction:  Applying the Random Forest Models}
 
 \begin{figure}
   \centering
   \begin{tabular}{c}
-    \includegraphics[width=85mm]{Figures/pipeline.pdf}
+    \includegraphics[width=90mm]{Figures/pipeline.pdf}
   \end{tabular}
-  \caption{Diagrammatic workflow for the proposed RF model prediction.  The feature
+  \caption{Diagrammatic workflow for the proposed random forest model prediction.  The feature
   images are first generated from the input MRI and symmetric multivariate template. 
-  After organization of the feature images in a csv file, the stage 1 RF model is 
+  After organization of the feature images in a csv file, the stage 1 random forest model is 
   applied which results in a first stage classification voting output.  This output
   is used to generate an additional set of feature images for the second classification
   stage.  The final refinement process entails a series of binary morphological 
@@ -725,48 +842,139 @@ the elongation, and eccentricity.
   \label{fig:pipeline}
 \end{figure}
 
+Once the models are created, classification of tumors in new subjects is performed
+as illustrated in Figure \ref{fig:pipeline}.  From the feature images and input 
+GMM model, a tentative set of random forest voting output confidence images are produced.
+As described, this is used as input to the second prediction round.  The 
+final probability output images are used to produce the maximum labeling.  
 
-
-
-
-
-
-\begin{figure*}
-  \centering
-  \begin{tabular}{cc}
-  \includegraphics[width=80mm]{Figures/BRATS_HG_GMM.pdf} &
-  \includegraphics[width=80mm]{Figures/BRATS_HG_MAP_MRF.pdf} \\
-  \includegraphics[width=80mm]{Figures/BRATS_LG_GMM.pdf} &
-  \includegraphics[width=80mm]{Figures/BRATS_LG_MAP_MRF.pdf}
-  \end{tabular}
-  \caption{Feature images from the BRATS\_HG0004 data set.}
-\end{figure*}
-
-
-
-
-
+A final round of binary morphological operations were heuristically designed
+to improve the final segmentation results such as removal of small connected 
+components and morphological closure of certain regions.
+All these steps are included in the perl script 
+{\tt applyTumorSegmentationModelForCohort.pl} designed for parallel subject 
+processing on the computational cluster at the University of Virginia.%
+\footnote{
+http://www.uvacse.edu
+}
 
 \section{Results}
 
 \begin{table*}
-\caption{Dice scores from the MICCAI 2012 BRATs Study}
+\caption{Results from the MICCAI 2013 BRATS Challenge}
+\label{table:results}
 \begin{center}
-\begin{tabular*}{0.975\textwidth}{@{\extracolsep{\fill} } c c c c c c c c c}
+\begin{tabular*}{0.99\textwidth}{@{\extracolsep{\fill} } c c c c c c c c c c c}
 \toprule
-{} & \multicolumn{2}{c}{High-grade (real)} & \multicolumn{2}{c}{Low-grade (real)} & \multicolumn{2}{c}{High-grade (simulated)} & \multicolumn{2}{c}{Low-grade (simulated)}\\
-{\bf Method} & Edema & Tumor & Edema & Tumor & Edema & Tumor & Edema & Tumor\\
+{\bf Data set} & {\bf Rank} & \multicolumn{3}{c}{\bf Dice} & \multicolumn{3}{c}{ \bf Positive Predictive Value} & \multicolumn{3}{c}{ \bf Sensitivity} \\
+{} & {} & complete & core & enhanced & complete & core & enhanced & complete & core & enhanced \\
 \midrule
-\cite{zikic2012} & {$0.70 \pm 0.09$} & {$0.71 \pm 0.24$} & {$0.44 \pm 0.18$} & {$0.62 \pm 0.27$} & {$0.65 \pm 0.27$} & {$0.90 \pm 0.05$} & {$0.55 \pm 0.23$} & {$0.71 \pm 0.20$} \\
-\cite{bauer2012} & {$0.61 \pm 0.15$} & {$0.62 \pm 0.27$} & {$0.35 \pm 0.18$} & {$0.49 \pm 0.26$} & {$0.68 \pm 0.26$} & {$0.90 \pm 0.06$} & {$0.57 \pm 0.24$} & {$0.74 \pm 0.10$} \\
-ANTsR & {$0.65 \pm 0.15$} & {$0.66 \pm 0.28$} & {$0.49 \pm 0.16$} & {$0.65 \pm 0.21$} & {$0.68 \pm 0.25$} & {$0.91 \pm 0.08$} & {$0.61 \pm 0.25$} & {$0.84 \pm 0.09$} \\
-w/ Atropos & {$0.68 \pm 0.15$} & {$0.67 \pm 0.30$} & {$0.50 \pm 0.15$} & {$0.67 \pm 0.23$} & {$0.74 \pm 0.26$} & {$0.92 \pm 0.09$} & {$0.65 \pm 0.26$} & {$0.84\pm 0.08$} \\
+Challenge & 1 & 0.87 (1) & 0.78 (1) & 0.74 (1) & 0.85 (2) & 0.74 (5) & 0.69 (4) & 0.89 (2) & 0.88 (1) & 0.83 (1) \\
+Leaderboard & 1 & 0.79 (2) & 0.65 (1) & 0.53 (3) & 0.83 (1) & 0.70 (2) & 0.51 (3) & 0.81 (4) & 0.73 (2) & 0.66 (2) \\
+Evaluation & 2 & 0.88 (2) & 0.76 (2) & 0.55 (3) & 0.88 (3) & 0.80 (5) & 0.65 (3) & 0.89 (3) & 0.79 (3) & 0.53 (3) \\
 \bottomrule
 \end{tabular*}
 \end{center}
 \end{table*}
 
+A total of four random forest models were created from the 30 training data 
+sets. Two models for Stage 1 and Stage 2 processing were generated from the 
+20 high-grade glioma evaluation data described earlier.  Similarly, two
+additional models were created from the 10 low-grade glioma data sets.  Following
+model construction, weighted importance feature plots described earlier were 
+rendered to provide feedback as to the individual potential predictive accuracy
+of each feature.  The high-grade plots are given in Figure \ref{fig:hgimportance}
+whereas the low-grade plots are given in Figure \ref{fig:lgimportance}.
+
+\begin{figure*}
+  \makebox[\textwidth][c]{
+  \begin{tabular}{cc}
+  \includegraphics[width=90mm]{Figures/BRATS_HG_GMM.pdf} &
+  \includegraphics[width=90mm]{Figures/BRATS_HG_MAP_MRF.pdf} \\
+  \end{tabular}
+  }
+  \caption{{\tt MeanDecreaseAccuracy} plots generated from the high-grade glioma
+  Stage 1 and Stage 2 random forest models.  These plots provide a weighted 
+  ranking describing the importance of each feature for predictive accuracy. 
+  Features are listed from most to least important.
+  }
+  \label{fig:hgimportance}
+\end{figure*}
+
+\begin{figure*}
+  \makebox[\textwidth][c]{
+  \begin{tabular}{cc}
+  \includegraphics[width=90mm]{Figures/BRATS_LG_GMM.pdf} &
+  \includegraphics[width=90mm]{Figures/BRATS_LG_MAP_MRF.pdf} \\
+  \end{tabular}
+  }
+  \caption{{\tt MeanDecreaseAccuracy} plots generated from the low-grade glioma
+  Stage 1 and Stage 2 random forest models.  These plots provide a weighted 
+  ranking describing the importance of each feature for predictive accuracy.
+  Features are listed from most to least important.
+  }
+  \label{fig:lgimportance}
+\end{figure*}
+
+Immediately apparent from these plots are the importance of certain features.
+In general, the features based on the symmetric template are quite
+discriminative thus justifying the increased computational 
+resources required to generate such features.  For single-threaded processing
+on the cluster, creating the feature images for a single subject required 
+approximately 2 hours of total processing time of which the template registration 
+component took approximately 75\%.  Additionally, the first order 
+statistical features also seemed fairly important which is something that
+previous work had demonstrated \citep[e.g.][]{bauer2012,zikic2012}.
+There are a number of differences, however, between low-grade and high-grade 
+importance outcomes which would also seem to justify the creation of separate
+glioma class models.
+
+As described earlier, the MICCAI 2013 BRATS challenge data was provided to the
+competitors in three sets.  The Evaluation set was used primarily for training
+although an initial ranking was performed for all the competitors to aid in
+determining participation in the workshop.  Shortly prior to the actual workshop
+date, the Leaderboard data was released to the competitors for posting of results
+and subsequent ranking.  Finally, the night before the competition, the Challenge
+data was made available and used to produce the final competitor ranking.  In addition
+to the Dice overlap measure, additional performance emeasures for producing the rankings 
+included the positive predictive value, and sensitivity (all of which can be calculated
+using open source tools such as \cite{tustison2009}).  
+For all three data sets, we provide these overlap measures and relative competitor 
+ranking in Table \ref{table:results}.  Full competition results can be viewed
+at {\tt http://www.virtualskeleton.ch}.
+
 \section{Discussion and Conclusions} 
+
+Although previous research has employed random forests for supervised brain
+segmentation, our contribution of concatenated model application and use
+of symmetric multivariate templates demonstrated good performance 
+in the recent MICCAI 2013 Brain Tumor Segmentation challenge/workshop.  
+In terms of variable importance, the latter provided several highly 
+discriminative features which resulted in the top-performing algorithm 
+of the competition.  This confirmed what others have found in that
+random forests provide an excellent framework for prediction in certain
+medical image analysis problems.
+
+
+
+Although these competitions are extremely useful as they provide objective
+assessment of algorithmic performance given the prevalence of selection bias
+in reporting results in conventional publication venues, even more important
+is the availing of the actual algorithmic instantiation (i.e. code) so that
+others can more easily build upon and utilize what has proven effective. 
+This also provides an opportunity for the users to return
+constructive feedback to the authors thereby improving the original offering.  
+
+However, as explained previously, the brain tumor segmentation 
+methodology that we have made available is only a small part of the 
+larger software package that we have created in ANTsR.  Not only does
+ANTsR significantly facilitate the development of the work discussed,
+but it provides an interface to one of the most powerful statistical
+packages available in R.  The combination of the well-known ANTs software
+package with R provides tremendous potential for future insightful analyses 
+and graphical displays.
+
+
 
 %% References with bibTeX database:
 

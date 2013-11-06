@@ -2,12 +2,56 @@
 %% http://bibdesk.sourceforge.net/
 
 
-%% Created for Nick Tustison at 2013-11-02 13:08:48 -0400 
+%% Created for Nick Tustison at 2013-11-06 12:00:41 -0500 
 
 
 %% Saved with string encoding Unicode (UTF-8) 
 
 
+
+@inproceedings{avants2010a,
+	Author = {Avants, Brian B and Klein, Arno and Tustison, Nicholas J and Woo, John and Gee, James C},
+	Date-Added = {2013-11-06 17:00:40 +0000},
+	Date-Modified = {2013-11-06 17:00:40 +0000},
+	Organization = {Human Brain Mapping},
+	Title = {Evaluation of an Open-Access, Automated Brain Extraction Method on Multi-Site Multi-Disorder Dat},
+	Year = {2010}}
+
+@article{tustison2009,
+	Author = {N. J. Tustison and J. C. Gee},
+	Date-Added = {2013-11-06 15:52:10 +0000},
+	Date-Modified = {2013-11-06 15:52:14 +0000},
+	Journal = {Insight Journal},
+	Title = {Introducing {Dice}, {Jaccard}, and Other Label Overlap Measures To {ITK}},
+	Year = {2009}}
+
+@article{avants2011a,
+	Abstract = {The United States National Institutes of Health (NIH) commit significant support to open-source data and software resources in order to foment reproducibility in the biomedical imaging sciences. Here, we report and evaluate a recent product of this commitment: Advanced Neuroimaging Tools (ANTs), which is approaching its 2.0 release. The ANTs open source software library consists of a suite of state-of-the-art image registration, segmentation and template building tools for quantitative morphometric analysis. In this work, we use ANTs to quantify, for the first time, the impact of similarity metrics on the affine and deformable components of a template-based normalization study. We detail the ANTs implementation of three similarity metrics: squared intensity difference, a new and faster cross-correlation, and voxel-wise mutual information. We then use two-fold cross-validation to compare their performance on openly available, manually labeled, T1-weighted MRI brain image data of 40 subjects (UCLA's LPBA40 dataset). We report evaluation results on cortical and whole brain labels for both the affine and deformable components of the registration. Results indicate that the best ANTs methods are competitive with existing brain extraction results (Jaccard=0.958) and cortical labeling approaches. Mutual information affine mapping combined with cross-correlation diffeomorphic mapping gave the best cortical labeling results (Jaccard=0.669$\pm$0.022). Furthermore, our two-fold cross-validation allows us to quantify the similarity of templates derived from different subgroups. Our open code, data and evaluation scripts set performance benchmark parameters for this state-of-the-art toolkit. This is the first study to use a consistent transformation framework to provide a reproducible evaluation of the isolated effect of the similarity metric on optimal template construction and brain labeling.},
+	Author = {Avants, Brian B and Tustison, Nicholas J and Song, Gang and Cook, Philip A and Klein, Arno and Gee, James C},
+	Date-Added = {2013-11-03 22:08:59 +0000},
+	Date-Modified = {2013-11-03 22:09:11 +0000},
+	Doi = {10.1016/j.neuroimage.2010.09.025},
+	Journal = {Neuroimage},
+	Journal-Full = {NeuroImage},
+	Mesh = {Algorithms; Brain; Databases, Factual; Diagnostic Imaging; Head; Humans; Image Processing, Computer-Assisted; Linear Models; Models, Anatomic; Models, Neurological; Population; Reproducibility of Results; Software},
+	Month = {Feb},
+	Number = {3},
+	Pages = {2033-44},
+	Pmc = {PMC3065962},
+	Pmid = {20851191},
+	Pst = {ppublish},
+	Title = {A reproducible evaluation of ANTs similarity metric performance in brain image registration},
+	Volume = {54},
+	Year = {2011},
+	Bdsk-Url-1 = {http://dx.doi.org/10.1016/j.neuroimage.2010.09.025}}
+
+@article{tustison2013a,
+	Author = {N. J. Tustison and B. B. Avants},
+	Date-Added = {2013-11-03 21:33:41 +0000},
+	Date-Modified = {2013-11-03 22:55:09 +0000},
+	Journal = {Front Neurosci},
+	Title = {Explicit {B}-spline regularization in diffeomorphic image registration},
+	Year = {submitted}}
 
 @article{price2003,
 	Abstract = {AIM: To determine whether diffusion tensor imaging (DTI) of brain tumours can demonstrate abnormalities distal to hyperintensities on T2-weighted images, and possibly relate these to tumour grade.
@@ -16,7 +60,7 @@ RESULTS: The abnormality on DTI was larger than that seen on T2-weighted images 
 CONCLUSIONS: Subtle white matter disruption can be identified using DTI in patients with high-grade gliomas. Such disruption is not identified in association with metastases or low-grade gliomas despite these tumours producing significant mass effect and oedema. We suggest the changes in DTI may be due to tumour infiltration and that the DTI may provide a useful method of detecting occult white matter invasion by gliomas.},
 	Author = {Price, S J and Burnet, N G and Donovan, T and Green, H A L and Pe{\~n}a, A and Antoun, N M and Pickard, J D and Carpenter, T A and Gillard, J H},
 	Date-Added = {2013-11-02 17:08:25 +0000},
-	Date-Modified = {2013-11-02 17:08:48 +0000},
+	Date-Modified = {2013-11-04 01:39:16 +0000},
 	Journal = {Clin Radiol},
 	Journal-Full = {Clinical radiology},
 	Mesh = {Adult; Aged; Aged, 80 and over; Anisotropy; Brain; Brain Neoplasms; Female; Glioma; Humans; Magnetic Resonance Imaging; Male; Middle Aged; Neoplasm Invasiveness},
@@ -25,7 +69,7 @@ CONCLUSIONS: Subtle white matter disruption can be identified using DTI in patie
 	Pages = {455-62},
 	Pmid = {12788314},
 	Pst = {ppublish},
-	Title = {Diffusion tensor imaging of brain tumours at 3T: a potential tool for assessing white matter tract invasion?},
+	Title = {Diffusion tensor imaging of brain tumours at {3T}: a potential tool for assessing white matter tract invasion?},
 	Volume = {58},
 	Year = {2003}}
 
@@ -49,7 +93,7 @@ CONCLUSIONS: Subtle white matter disruption can be identified using DTI in patie
 	Abstract = {MRI-based medical image analysis for brain tumor studies is gaining attention in recent times due to an increased need for efficient and objective evaluation of large amounts of data. While the pioneering approaches applying automated methods for the analysis of brain tumor images date back almost two decades, the current methods are becoming more mature and coming closer to routine clinical application. This review aims to provide a comprehensive overview by giving a brief introduction to brain tumors and imaging of brain tumors first. Then, we review the state of the art in segmentation, registration and modeling related to tumor-bearing brain images with a focus on gliomas. The objective in the segmentation is outlining the tumor including its sub-compartments and surrounding tissues, while the main challenge in registration and modeling is the handling of morphological changes caused by the tumor. The qualities of different approaches are discussed with a focus on methods that can be applied on standard clinical imaging protocols. Finally, a critical assessment of the current state is performed and future developments and trends are addressed, giving special attention to recent developments in radiological tumor assessment guidelines.},
 	Author = {Bauer, Stefan and Wiest, Roland and Nolte, Lutz-P and Reyes, Mauricio},
 	Date-Added = {2013-11-02 15:24:33 +0000},
-	Date-Modified = {2013-11-02 15:24:45 +0000},
+	Date-Modified = {2013-11-05 22:18:11 +0000},
 	Doi = {10.1088/0031-9155/58/13/R97},
 	Journal = {Phys Med Biol},
 	Journal-Full = {Physics in medicine and biology},
@@ -58,7 +102,7 @@ CONCLUSIONS: Subtle white matter disruption can be identified using DTI in patie
 	Pages = {R97-129},
 	Pmid = {23743802},
 	Pst = {ppublish},
-	Title = {A survey of MRI-based medical image analysis for brain tumor studies},
+	Title = {A survey of {MRI}-based medical image analysis for brain tumor studies},
 	Volume = {58},
 	Year = {2013},
 	Bdsk-Url-1 = {http://dx.doi.org/10.1088/0031-9155/58/13/R97}}
@@ -251,10 +295,10 @@ Our approach builds on the detection work of Viola and Jones. Novel contribution
 @article{liaw2002,
 	Author = {Andy Liaw and Matthew Wiener},
 	Date-Added = {2013-04-09 16:14:15 +0000},
-	Date-Modified = {2013-10-23 22:24:32 +0000},
+	Date-Modified = {2013-11-04 01:40:43 +0000},
 	Journal = {R News},
 	Pages = {18--22},
-	Title = {Classification and Regression by randomForest},
+	Title = {Classification and Regression by {randomForest}},
 	Volume = {2/3},
 	Year = {2002}}
 
