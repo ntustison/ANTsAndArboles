@@ -503,7 +503,10 @@ in \cite{criminisi2011}.
 %unlabeled subject. 
 
 One of the innovations that we provide in this work is
-the use of concatenated random forests for improved probabilistic estimation
+the use of \textit{concatenated random forests} \textcolor{red}{where
+  does the name come from?  it doesnt get mentioned again until the
+  discussion section ... expanding on this / defining it could help
+  ``novelty'' angle in neuroimage submission .... FIXME} for improved probabilistic estimation
 of the brain segmentation labels.  Briefly, Gaussian mixture
 modeling (GMM) is used to create a subset of feature images which are
 used to train and predict during the first classification stage.  
@@ -663,7 +666,11 @@ Figure \ref{fig:symmetrictemplates} we show mid-axial slices from
 the Kirby multivariate symmetrical template consisting of FA, FLAIR,  
 T1, and T2 components.  Although DTI-based images were not included in the
 challenge data, such images have shown discriminative potential 
-\citep[e.g.][]{price2003} to warrant investigation in our future work.
+\citep[e.g.][]{price2003} to warrant investigation in our future
+work.  The general procedure for const ructing a symmetric template involves flipping data around the mid-sagittal
+plane, as outlined in prior work
+\citep{Hopkins2013}. \textcolor{red}{FIXME-nick, is that correct? is
+  this covered in the scripts?  if so, where?}
 
 \subsubsection{Multi-Modal Feature Image Generation}
 
@@ -730,12 +737,17 @@ available ANTs-based solution to the brain extraction problem
 is found in the script {\tt antsBrainExtraction.sh} which uses
 a hybrid approach based on image registration and binary morphology
 to isolate the brain \cite{avants2010a}.  We recently performed an evaluation of over 1200
-MRI which demonstrated perfect performance \cite{tustison2013a}.
+MRI which demonstrated performance that is comparable or better than
+other available methodology \cite{tustison2013a}.
 
 
-\paragraph{Stage 1 (GMM)}
-Prior  cluster centers for specific tissue types learned from training data \citep{reynolds2009} are used in the GMM random forest stage to create 
-multiple feature images.  
+\paragraph{Stage 1 (GMM)} \textcolor{red}{Need more descriptive
+  section name ... lots going on in the paper , easy to get disoriented}
+Prior cluster centers for specific tissue types learned from training data \citep{reynolds2009} are used in the GMM random forest stage to create 
+multiple feature images.  \textcolor{red}{FIXME I think this should be
+  expanded upon a bit ... can you be more specific?  how are these
+  cluster centers passed to the RF?  why are these centers portable to
+  this new data? etcetera.}
 Given $M$ tissue types, a GMM formulates the 
 probability distribution at each voxel, $\mathbf{x}$, as the
 sum of Gaussian components, $\mathcal{N}(\mathbf{x}|\mu,\sigma)$, i.e.
@@ -745,13 +757,23 @@ p\left(\mathbf{x}|\mu_m,\sigma_m,\lambda_m\right) = \sum_{i=1}^M \lambda_m \math
 where $\sum_{m=1}^M \lambda_m = 1$.  One popular method for 
 determining the parameters of the GMM is maximum likelihood 
 estimation which can performed using the Atropos segmentation 
-tool \citep{avants2011} available in ANTs.  
+tool \citep{avants2011} available in ANTs.  \textcolor{red}{FIXME
+  would prefer active voice version of the sentence to make clear that
+  Atropos uses EM} See Figure~\ref{fig:featureImages} for
+an example segmentation.  
+
+
+\textcolor{red}{should there be an RF model equation here?  i.e. what
+  exactly (in R) was used ?}
 
 \paragraph{Stage 2 (MAP-MRF):}
 
 Prediction during the GMM stage results in a set of random 
 forest voting classification maps giving a probabilistic estimate
-of the label value at each voxel.  These spatial probability
+of the label value at each voxel.  \textcolor{red}{FIXME ---i think
+  this sentence is confusing ... did you already run the RF at this
+  point?  seems no ... but ``results in a set of RF voting
+  classification maps'' sounds like you already have them.}  These spatial probability
 maps can be used as spatial priors in a MAP-MRF segmentation
 estimation protocol also performed using the Atropos segmentation 
 tool \citep{avants2011} available in ANTs although we couple
@@ -763,6 +785,11 @@ during the first stage of prediction along with the other feature
 images previously generated (such as the template-based data).
 We discovered that this composite application of random
 forest models improves the resulting labeled output.
+
+\textcolor{red}{ok ... but i still don't understand this ... it gives
+  me a vague idea ... can you sketch out the equations for these
+  features/predictors? and give better intuition of what the
+  ``composite'' RF (previously referred to as concatenated?) is?}
 
 For both stages, in contrast to previous generative
 modeling approaches for multi-modal tumor segmentation 
@@ -851,6 +878,10 @@ to be the most discriminative.%
 \footnote{
 There is an issue with consistently ranking correlated predictors as described at {\tt http://www.r-bloggers.com/random-forest-variable-importance/} since the permutation testing performed for predictive accuracy assessment assumes predictor independence.  Correctives have been proposed but we ignore these issues for this particular application.
 }
+
+\textcolor{red}{do you actually use variable importance or no?
+  i.e. to trim the number of features?  overall, having a hard time
+  seeing what is possible versus what was actually done ... }
 
 \subsubsection{Prediction:  Applying the Random Forest Models}
 
@@ -958,6 +989,14 @@ There are a number of differences, however, between low-grade and high-grade
 importance outcomes which would also seem to justify the creation of separate
 glioma class models.
 
+
+\textcolor{red}{how novel is this a/symmetry stuff?  i have the chimp
+  paper that briefly mentions it but could this be spun as a
+  ``contribution'' (with additional technical detail) in addition to pointing out the benefit of asymmetry
+  plus RF's?  also see
+  \href{http://stnava.github.io/asymmetry/}{http://stnava.github.io/asymmetry/}
+  which is sort of novel ... }
+
 As described earlier, the MICCAI 2013 BRATS challenge data was provided to the
 competitors in three sets.  The Evaluation set was used primarily for training
 although an initial ranking was performed for all the competitors to aid in
@@ -975,16 +1014,25 @@ at {\tt http://www.virtualskeleton.ch}.
 \section{Discussion and Conclusions} 
 
 Although previous research has employed random forests for supervised brain
-segmentation, our contribution of concatenated model application and use
+segmentation, our contribution of \textcolor{red}{concatenated model} application and use
 of symmetric multivariate templates demonstrated good performance 
 in the recent MICCAI 2013 Brain Tumor Segmentation challenge/workshop.  
 In terms of variable importance, the latter provided several highly 
 discriminative features which resulted in the top-performing algorithm 
 of the competition.  This confirmed what others have found in that
 random forests provide an excellent framework for prediction in certain
-medical image analysis problems.
+medical image analysis problems.  Even with relatively few training
+subjects relative to input variables, the random forest models
+perform generalizably.
+In addition, this work highlights the value of  a symmetric multiple
+modality template for clinical disorders in which asymmetry is a
+hallmark.  Furthermore, our challenge-leading results establish the
+value of such templates in multiple modality prediction
+tasks in which there is a small training set with an abundance of
+multivariate data.
 
-
+\textcolor{red}{\subsection{Discussion of clinical relevance of the multivariate
+  features we ``found''}}
 
 Although these competitions are extremely useful as they provide objective
 assessment of algorithmic performance given the prevalence of selection bias
