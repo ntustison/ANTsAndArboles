@@ -38,7 +38,7 @@
 %% \documentclass[final,5p,times,twocolumn]{elsarticle}
 
 
-\usepackage{color}
+\usepackage{color,hyperref}
 \usepackage{multirow,booktabs,ctable,array}
 \usepackage{lscape}
 \usepackage{amsmath}
@@ -150,7 +150,7 @@
 
 \begin{frontmatter}
 
-\title{Multivariate Neuroimage Analysis with ANTsR: Application to Supervised Brain Tumor Segmentation using Random Forests}
+\title{Multivariate Neuroimage Analysis with \textit{ANTsR}: Application to Supervised Brain Tumor Segmentation using Random Forests}
 
 \author[label1]{Nicholas J.~Tustison
   \fnref{label0}}
@@ -175,22 +175,22 @@
 
 \begin{abstract} 
 Improvements in image acquisition and increasingly sophisticated statistical techniques 
-for neuroanalysis have motivated the development of advanced computational software 
-packages for studying the
-brain---many of which
-have been made publicly available.  One such popular toolkit is the open source Advanced
+for medical image analysis have motivated the development of advanced computational software 
+packages, many of which
+have been made publicly available.  One such popular toolkit is the
+free and open source Advanced
 Normalization Tools (ANTs) which contains a suite of well-vetted processing tools for
 core data transformation tasks such as image registration, image segmentation, 
 inhomogeneity field correction, and template building.  Despite the numerous
-solutions afforded by such packages, neuroscience (and data analysis in general) requires
+solutions afforded by medical image analysis software, neuroscience (and data analysis in general) requires
 robust, statistical tools for making predictive inferences with respect to given hypotheses
 and for rendering quantitative information in clarifying and insightful ways.  
 In this paper, we describe the
-coupling of ANTs with the widely-used R language---an open source environment for 
-statistical processing and data visualization---which we denote as ANTsR.  One of the
+coupling of ANTs with the widely-used \textit{R} language---an open source environment for 
+statistical processing and data visualization---which we denote as \textit{ANTsR}.  One of the
 many benefits from such integration is the accessibility to advanced statistical 
 and machine learning techniques as well as state-of-the-art visualization possibilities.  
-To showcase the flexibility and utility of ANTsR, we 
+To showcase the flexibility and utility of \textit{ANTsR}, we 
 apply it to the difficult problem of brain tumor segmentation from multi-modality
 MRI.  The reported algorithmic framework was the top-performing entry in the MICCAI 2013 Multimodal 
 Brain Tumor Segmentation (BRATS) challenge and, to our knowledge, is the only entry for
@@ -198,7 +198,7 @@ both challenge years (2012, 2013) which has been made publicly available as open
 \end{abstract}
 
 \begin{keyword}
-advanced normalization tools \sep BRATS \sep brain tumor segmentation \sep R project \sep random forests
+advanced normalization tools \sep BRATS \sep brain tumor segmentation \sep \textit{R} project \sep random forests
 %% keywords here, in the form: keyword \sep keyword
 \end{keyword}
 
@@ -240,36 +240,36 @@ advanced normalization tools \sep BRATS \sep brain tumor segmentation \sep R pro
 
 \section{Introduction}
 
-ANTs (Advanced Normalization Tools) originated with the open source availing
-of high-performance registration algorithms for neuroimage analysis
-\citep{avants2008a} built upon the mature Insight Toolkit (ITK)
-of the National Institutes of Health.  Since then, ANTs has grown to include 
-several algorithmic solutions for robust medical image analysis including bias 
+ANTs (Advanced Normalization Tools) was built, originally, to provide 
+high performance image registration for medical image analysis
+\citep{avants2008a} and based upon the mature Insight Toolkit (ITK)
+sponsored by the National Institutes of Health.  Since then, ANTs has grown to include 
+several robust medical image analysis solutions including bias 
 correction \citep{tustison2010}, $n$-tissue multivariate segmentation 
 \citep{avants2011}, template construction \citep{avants2010}, and cortical 
 thickness estimation \citep{das2009} (many of which have been
 introduced into ITK partially in an attempted leveraging of Linus's Law---``Given enough eyeballs, all bugs are shallow'').  
 However, in the evolution of the toolkit, it became clear 
 that robust statistical machinery was lacking for making inferences regarding
-the data produced during the course of ANTs processing.  ANTsR was developed
+the data produced during the course of ANTs processing.  \textit{ANTsR} was developed
 specifically to provide an interface between ANTs, a 
 powerful neuroimaging toolkit for producing reliable imaging data 
-transformations, and the R project%
+transformations, and the \textit{R} project%
 \footnote{
 http://www.r-project.org
 }
 for statistical computing and visualization thus providing a complete
-set of tools for multivariate neuroimage analysis. 
+set of tools for multivariate neuroimage analysis \textit{ANTsR} intends to provide a modern framework for medical analytics, with a focus on imaging-assisted prediction and statistical power.
 
-%In addition to describing ANTsR basics and how it can be
+%In addition to describing \textit{ANTsR} basics and how it can be
 %used generally in multivariate neuroimaging studies, 
-We showcase ANTsR with
+We showcase \textit{ANTsR} with
 the particularly difficult application of supervised brain tumor
 segmentation \citep{bauer2013} for which we use the increasingly popular 
 random forests machine learning technique.  Although random forests have
 been proposed previously in the literature for, among other things, 
 supervised brain segmentation (e.g. \cite{geremia2011}), 
-we demonstrate that ANTsR significantly facilitates the construction 
+we demonstrate that \textit{ANTsR} significantly facilitates the construction 
 of a fully functional, parallelizable workflow for such a task and 
 that the performance of our proposed framework has proven extremely effective in 
 actual practice, specifically
@@ -300,7 +300,7 @@ that participated in either years' challenges to do this.
 
 \section{Materials and Methods}
 
-\subsection{ANTsR:  An ANTs/R Interface}
+\subsection{\textit{ANTsR}:  An ANTs/\textit{R} Interface}
 
 \subsubsection{Overview}
 
@@ -328,9 +328,9 @@ optimization.%
 http://www.numpy.org
 }  
 
-Careful consideration of available options
-led to the adoption of R to complement ANTs capabilities resulting in the
-ANTsR package.
+Careful consideration of available statistical software 
+led to the adoption of \textit{R} to complement ANTs quantification resulting in the
+\textit{ANTsR} package.
 %The R project for statistical computing,%
 %\footnote{
 %www.r-project.org
@@ -338,30 +338,32 @@ ANTsR package.
 % or more compactly
 %`R', is an environment for statistical computation
 %and data visualization.  
-R's open source code base
+\textit{R}'s open source code base, reliable software testing and distribution strategies,
 and add-on packages coupled with its rapidly growing 
 community of developers and users has caused wide-scale
 adoption within both academia and industry.
 
 \subsubsection{Installation}
 
-The ANTsR package is publicly available on the github project hosting service.%
+The \textit{ANTsR} package is publicly available on the github project hosting service.%
 \footnote{
-https://github.com/stnava/ANTsR
+\href{https://github.com/stnava/ANTsR}{https://github.com/stnava/ANTsR}
 }
-Prior to installation of ANTsR, several external R packages
+Prior to installation of \textit{ANTsR}, several external R packages
 need to be installed including: \verb#Rcpp#, \verb#signal#, \verb#timeSeries#, 
 \verb#mFilter#, \verb#doParallel#, \verb#robust#, \verb#magic#, \verb#knitr#, \verb#pixmap#, 
-\verb#rgl#, and \verb#misc3d#.  Additionally, in order
+\verb#rgl#, and \verb#misc3d#.  
+See \href{http://stnava.github.io/software/2014/01/08/antsr/}{http://stnava.github.io/software/2014/01/08/antsr/} for current status. 
+Additionally, in order
 to perform the supervised brain segmentation as described 
 in later sections, one needs to also install the packages
 \verb#randomForest#, \verb#snowfall#, \verb#rlecuyer#,
 and \verb#ggplot2#.%
 \footnote{
-Packages are easily installed using the {\tt install.packages()} R mechanism.
+Packages are easily installed using the {\tt install.packages()} \textit{R} mechanism.
 } 
 
-In addition to R and the add-on packages previously mentioned, CMake is also 
+In addition to \textit{R} and the add-on packages previously mentioned, CMake is also 
 required.  CMake%
 \footnote{
 http://www.cmake.org/
@@ -374,12 +376,26 @@ such as the Insight Toolkit (ITK)%
 http://www.itk.org/
 }
 and ANTs.  Further instructions for download and
-installation can be found on the ANTsR github website.
+installation can be found on the \textit{ANTsR} github website.  Feel
+free to contact the authors if installation trouble occurs.  We note
+that \textit{ANTsR} is currently only tested on UNIX-alikes such OSX and Ubuntu
+operating systems.  \footnote{Windows installation should be possible
+  but, to our knowledge, has not been attempted.}.
 
 \subsubsection{Usage}
-The utility of ANTsR stems from the ability to couple ANTs core 
+\textit{ANTsR} is intended to not only allow easy interchange between
+medical imaging formats and \textit{R} but also to facilitate
+reproducible scientific studies and the type compilable analysis
+articles that are fundamental to journals such as
+\textit{Biostatistics}.  Both \verb#knitr# and \verb#sweave#
+facilitate integration of \textit{R}-code with the LaTeX document
+preparation system.  
+
+An additional motivation for our development of \textit{ANTsR} (and
+hopefully its acceptance by the community) 
+stems from the ability to couple ANTs core 
 functionality, including IO tools such as \verb#antsImageRead#, 
-with the large number of R statistical and
+with the large number of \textit{R} statistical and
 visualization packages.  Due to this combination, several
 functions have been easily created for such neuroimaging-specific 
 tasks as fMRI/ASL data manipulation and analysis,
@@ -388,18 +404,18 @@ voxel and ROI-based  analyses,
 and connectivity visualization. % (e.g. \verb#plotBasicNetwork#).
 The user help menu and documentation for the library  and its
 constituent functions are invoked in the similar manner as other
-R libraries.
+\textit{R} libraries.
 
 As mentioned earlier, we have made this entire framework
-available as open source.  In addition to the ANTsR repository
-already on github which houses both ANTs and ANTsR functionality, 
+available as open source.  In addition to the \textit{ANTsR} repository
+already on github which houses both ANTs and \textit{ANTsR} functionality, 
 we created a special github repository specifically for this work
 containing figures, references, and text.%
 \footnote{
-https://github.com/ntustison/ANTsAndArboles
+\href{https://github.com/ntustison/ANTsAndArboles}{https://github.com/ntustison/ANTsAndArboles}
 }
 Also, we posted all
-scripts (R, shell, and perl) used to coordinate the ANTsR processing 
+scripts (\textit{R}, shell, and perl) used to coordinate the \textit{ANTsR} processing 
 including:
 \begin{itemize}
   \item {\tt applyModel.R}:  applies a random forest model to a new 
@@ -425,6 +441,9 @@ including:
 We also include a fully functional 2-D example which performs
 both testing and training on sample challenge data.  
 
+\textcolor{red}{FIXME---what is the first thing a user should do?  is
+  there a basic test verifying the 2D result?}
+
 \subsection{Supervised Brain Tumor Segmentation with Random Forests}
 
 Supervised techniques generally consist of a training phase
@@ -437,7 +456,6 @@ used to construct a predictive model.  Although other
 classification techniques have been used to segment
 brain tumors (e.g. support vector machines \citep{bauer2011}),
 random forest models have proven particularly successful.
-
 
 Several machine learning concepts were integrated to create 
 the random forests framework first articulated in its entirety by Breiman
@@ -453,9 +471,9 @@ random sampling of the training data) was
 introduced by Breiman \cite{breiman1996} to achieve improved
 accuracy.%
 \footnote{
-One of the principal advantages of R is the extensive community of
+One of the principal advantages of \textit{R} is the extensive community of
 developers  who have contributed on the order of thousands of packages 
-extending R's capabilities beyond its core functionality.
+extending \textit{R} 's capabilities beyond its core functionality.
 Most relevant 
 is the {\tt randomForest} package developed from Breiman's original
 Fortran code by Liaw and Wiener \citep{liaw2002}.
@@ -815,7 +833,7 @@ characterizing each brain.
 Initial testing of our proposed framework was performed 
 on the training data using a leave-one-out strategy.  Once the
 feature images are created for each subject, the resulting images of the entire
-training cohort are organized in a csv file for input into the R script
+training cohort are organized in a csv file for input into the \textit{R} script
 {\tt createModel.R}.  Other possible input parameters include the requested 
 number of trees, number of samples per label, and number of threads for parallel
 processing.  The output is an {\tt RData} file describing the random forest
@@ -824,7 +842,7 @@ model which can be used for future predictions.
 Additionally, the {\tt randomForest} package provides  measurements 
 for determining the importance of chosen features when constructing the model.  
 This aids in potential feature pruning or intuiting model behavior.  As mentioned
-earlier, we provide the R script {\tt plotVariableImportance.R} to render
+earlier, we provide the \textit{R} script {\tt plotVariableImportance.R} to render
 one such quantity denoted as {\tt MeanDecreaseAccuracy}.  During model construction
 (specifically the out-of-bag error calculation stage), the decrease in prediction accuracy
 with the omission of a single feature or variable is tracked and averaged.  Thus,
@@ -978,11 +996,11 @@ constructive feedback to the authors thereby improving the original offering.
 
 However, as explained previously, the brain tumor segmentation 
 methodology that we have made available is only a small part of the 
-larger software package that we have created in ANTsR.  Not only does
-ANTsR significantly facilitate the development of the work discussed,
+larger software package that we have created in \textit{ANTsR}.  Not only does
+\textit{ANTsR} significantly facilitate the development of the work discussed,
 but it provides an interface to one of the most powerful statistical
-packages available in R.  The combination of the well-known ANTs software
-package with R provides tremendous potential for future insightful analysis.
+packages available in \textit{R}.  The combination of the well-known ANTs software
+package with \textit{R} provides tremendous potential for future insightful analysis.
 
 
 
