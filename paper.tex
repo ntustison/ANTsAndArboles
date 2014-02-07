@@ -150,7 +150,8 @@
 
 \begin{frontmatter}
 
-\title{Multivariate Neuroimage Analysis with \textit{ANTsR}: Application to Supervised Brain Tumor Segmentation using Random Forests}
+%\title{Multivariate Neuroimage Analysis with \textit{ANTsR}: Application to Supervised Brain Tumor Segmentation using Random Forests}
+\title{Optimal Symmetric Multimodal Templates and Concatenated Random Forests for Supervised Brain Tumor Segmentation (made easy) with \textit{ANTsR}}
 
 \author[label1]{Nicholas J.~Tustison
   \fnref{label0}}
@@ -159,7 +160,6 @@
 \author[label2]{K.~L.~Shrinidhi}
 \author[label1]{Max Wintermark}
 \author[label1]{Christopher R.~Durst}
-\author[label2]{Jeffrey T.~Duda}
 \author[label1]{James C.~Gee}
 \author[label3]{Murray C.~Grossman}
 \author[label2]{Brian B.~Avants}
@@ -174,31 +174,23 @@
 
 
 \begin{abstract} 
-Improvements in image acquisition and increasingly sophisticated statistical techniques 
-for medical image analysis have motivated the development of advanced computational software 
-packages, many of which
-have been made publicly available.  One such popular toolkit is the
-free and open source Advanced
-Normalization Tools (ANTs) which contains a suite of well-vetted processing tools for
-core data transformation tasks such as image registration, image segmentation, 
-inhomogeneity field correction, and template building.  Despite the numerous
-solutions afforded by medical image analysis software, neuroscience (and data analysis in general) requires
-robust, statistical tools for making predictive inferences with respect to given hypotheses
-and for rendering quantitative information in clarifying and insightful ways.  
-In this paper, we describe the
-coupling of ANTs with the widely-used \textit{R} language---an open source environment for 
-statistical processing and data visualization---which we denote as \textit{ANTsR}.  One of the
-many benefits from such integration is the accessibility to advanced statistical 
-and machine learning techniques as well as state-of-the-art visualization possibilities.  
-To showcase the flexibility and utility of \textit{ANTsR}, we 
-apply it to the difficult problem of brain tumor segmentation from multi-modality
-MRI.  The reported algorithmic framework was the top-performing entry in the MICCAI 2013 Multimodal 
-Brain Tumor Segmentation (BRATS) challenge and, to our knowledge, is the only entry for
-both challenge years (2012, 2013) which has been made publicly available as open source.
+Automated brain tumor segmentation in MRI is complicated by the lack of prior knowledge 
+concerning tumor location, spatial extent, shape, possible displacement of normal 
+tissue, and intensity signature, all of which limit 
+the applicability of well-established techniques that have demonstrated good performance 
+in related tasks such as normal brain tissue segmentation.  Due to this 
+limitation, we localize our prior knowledge strategy to each subject through the 
+use of subject-specific multimodal asymmetrical features which demonstrate excellent
+discriminative properties within the random forest machine learning framework.  
+This approach is made possible with symmetric multimodal brain templates which
+are optimal in terms of both shape and multivariate intensity.  Further performance improvements are demonstrated by a successive application of random forest models for increasing levels of feature refinement 
+ to which we refer as {\it concatenated random forests}.  Although the derived workflow involves many disparate components, the newly developed \textit{ANTsR} open source software package significantly facilitates the proposed methodology.  \textit{ANTsR}, a comprehensive interface of the popular Advanced Normalization Tools (ANTs) repository with the \textit{R} statistical project,
+integrates well-performing image analysis tools such as image registration, segmentation, bias correction, and template building with access to advanced statistical and machine learning techniques as well as state-of-the-art visualization possibilities.  
+The reported algorithmic framework was the top-performing entry in the MICCAI 2013 Multimodal Brain Tumor Segmentation challenge and, to our knowledge, is the only entry for both challenge years (2012 \& 2013) which has been made publicly available.
 \end{abstract}
 
 \begin{keyword}
-advanced normalization tools \sep BRATS \sep brain tumor segmentation \sep \textit{R} project \sep random forests
+advanced normalization tools \sep BRATS \sep brain tumor segmentation \sep \textit{R} project 
 %% keywords here, in the form: keyword \sep keyword
 \end{keyword}
 
@@ -239,66 +231,446 @@ advanced normalization tools \sep BRATS \sep brain tumor segmentation \sep \text
 %\input{methods}
 
 \section{Introduction}
+Given the complexity of tumor growth and appearance and the need
+for precise volumetric measurements for tumor characterization, 
+much research has been invested in computational approaches for 
+automated segmentation of tumor regions in MR images.  Several 
+approaches have been previously proposed in the literature as
+detailed in recent reviews \citep{angelini2007,bauer2013}.  
+Any type of commensurable algorithmic evaluation, however, is
+extremely problematic due to widely varying performance assessments
+described in the corresponding publications, lack of publicly available 
+evaluation data, and privately kept algorithmic instantiations.  
+In response to these issues, the Multimodal Brain Tumor Segmentation 
+(BRATS) challenge was initiated in 2012 (and continued in 2013) under 
+the auspices of the Medical Image Computing and Computer Assisted 
+Intervention Society in association with their annual international 
+conference \citep{menze2014}.
 
-ANTs (Advanced Normalization Tools) was built, originally, to provide 
-high performance image registration for medical image analysis
-\citep{avants2008a} and based upon the mature Insight Toolkit (ITK)
-sponsored by the National Institutes of Health.  Since then, ANTs has grown to include 
-several robust medical image analysis solutions including bias 
-correction \citep{tustison2010}, $n$-tissue multivariate segmentation 
-\citep{avants2011}, template construction \citep{avants2010}, and cortical 
-thickness estimation \citep{das2009} (many of which have been
-introduced into ITK partially in an attempted leveraging of Linus's Law---``Given enough eyeballs, all bugs are shallow'').  
-However, in the evolution of the toolkit, it became clear 
-that robust statistical machinery was lacking for making inferences regarding
-the data produced during the course of ANTs processing.  \textit{ANTsR} was developed
-specifically to provide an interface between ANTs, a 
-powerful neuroimaging toolkit for producing reliable imaging data 
-transformations, and the \textit{R} project%
-\footnote{
-http://www.r-project.org
-}
-for statistical computing and visualization thus providing a complete
-set of tools for multivariate neuroimage analysis \textit{ANTsR} intends to provide a modern framework for medical analytics, with a focus on imaging-assisted prediction and statistical power.
 
-%In addition to describing \textit{ANTsR} basics and how it can be
-%used generally in multivariate neuroimaging studies, 
-We showcase \textit{ANTsR} with
-the particularly difficult application of supervised brain tumor
-segmentation \citep{bauer2013} for which we use the increasingly popular 
-random forests machine learning technique.  Although random forests have
-been proposed previously in the literature for, among other things, 
-supervised brain segmentation (e.g. \cite{geremia2011}), 
-we demonstrate that \textit{ANTsR} significantly facilitates the construction 
-of a fully functional, parallelizable workflow for such a task and 
-that the performance of our proposed framework has proven extremely effective in 
-actual practice, specifically
- in the recent MICCAI 2013 Multimodal Brain Tumor Segmentation
-Challenge (see Figure \ref{fig:award}).%
-\footnote{
-http://martinos.org/qtim/miccai2013/
-}
-\begin{figure}
-  \centering
-  \includegraphics[width=90mm]{Figures/award.pdf}
-  \caption{First place certificate from the MICCAI 2013 BRATS challenge.}
-  \label{fig:award}
-\end{figure}
+After observing the 2012 challenge to gain insight for our own research 
+needs, we found that no teams had availed their software in any 
+form which prompted our participation in the challenge which took place
+the following year in Nagoya, Japan.  Heavily influenced by the success 
+of participants in the 2012 challenge (specifically, the work of 
+\cite{bauer2012,geremia2012,zikic2012}), we adopted the increasingly popular 
+random forest machine learning framework \citep{breiman2001} which 
+permits the inclusion of various features which might prove saliently 
+discriminative.  Instrumental to our success in the 2013 challenge 
+was the use of features based on multimodal shape and appearance 
+asymmetries which were generated via the construction of symmetric, 
+multivariate brain templates.  Additional improvements in performance
+were due to the use of a two-stage random forest model approach
+whereby the output probability images from the application of the first
+random forest model seeds the construction of a subset of new feature images
+for input into the second stage.  The results of the second random forest model
+are then refined using a series of heuristically-derived binary morphological
+operations.
 
-It is interesting to note that our participation in the 2013 challenge
-was the result of observing the 2012
-challenge, wanting to take advantage of the same methods as the winners,
-and finding that no teams had availed their software in any form.  In contrast, 
-and very much in line with our philosophy 
-regarding open science \citep{tustison2013,ince2012}, we have made this framework available as open 
-source (even releasing the code before the actual 2013 contest).%
+In line with our philosophy regarding open science \citep{tustison2013,ince2012}, 
+we made the code available as open source%
 \footnote{
 https://github.com/ntustison/BRATS2013
 }
-To our knowledge, we are the only competitors out of the 20 or so teams 
-that participated in either years' challenges to do this.
+and, to our knowledge, we are the only competitors out of the 20 or so teams 
+that participated in either years' challenges to do this.  All code is based
+on the well-vetted and open source Insight Toolkit (ITK)%
+\footnote{
+http://www.itk.org/
+} 
+of the National Institutes of Health and is available through our \textit{ANTsR} 
+package.
+
+In subsequent sections, we describe in greater detail the automated 
+supervised brain segmentation pipeline including the asymmetry
+analysis and the concatenated random forest construction.  We also
+describe the code and data used for the BRATS challenge so that 
+the interested reader can reproduce our results.  Finally, we 
+illustrate performance with results from the BRATS 2013 challenge.
+
+
+% which has demonstrated good performance
+%in other neuro-related tasks \citep[e.g.,][]{geremia2011}.  
+
+%Although random forests have been proposed previously in the 
+%literature for, among other things, supervised brain segmentation (e.g. 
+%\cite{geremia2011}), 
+%we demonstrate that \textit{ANTsR} significantly facilitates the construction 
+%of a fully functional, parallelizable workflow for such a task and 
+%that the performance of our proposed framework has proven extremely effective in 
+%actual practice, specifically
+% in the recent MICCAI 2013 Multimodal Brain Tumor Segmentation
+%Challenge.%
+%\footnote{
+%http://martinos.org/qtim/miccai2013/
+%}
+%\begin{figure}
+%  \centering
+%  \includegraphics[width=90mm]{Figures/award.pdf}
+%  \caption{First place certificate from the MICCAI 2013 BRATS challenge.}
+%  \label{fig:award}
+%\end{figure}
 
 \section{Materials and Methods}
+
+Certain key elements characterize the supervised brain tumor segmentation
+protocol including:
+\begin{itemize}
+  \item construction of symmetric multivariate templates for multimodal 
+        asymmetry-based features,
+  \item generation of other image-based features,
+  \item training of random forest models, and
+  \item prediction using the proposed framework.
+\end{itemize}
+A description of each of these components is detailed below along.
+
+\subsection{Multimodal Asymmetry Features from Multivariate Symmetric Templates}
+
+\setlength{\tabcolsep}{2pt}
+
+\begin{figure}[htb]
+  \centering
+  \begin{tabular}{cccc}
+  \includegraphics[width=20mm]{Figures/BRATS_HG0001/BRATS_HG0001_FLAIR_slice93.png} &
+  \includegraphics[width=20mm]{Figures/BRATS_HG0001/BRATS_HG0001_T1_slice93.png} &
+  \includegraphics[width=20mm]{Figures/BRATS_HG0001/BRATS_HG0001_T1C_slice93.png} &
+  \includegraphics[width=20mm]{Figures/BRATS_HG0001/BRATS_HG0001_T2_slice93.png} \\
+  (a) & (b) &
+  (c) & (d) \\
+  \end{tabular}
+  \caption{Induced bilateral asymmetry due to tumor presence causing
+  distortion of the plane of symmetry.  Shown are mid-axial slices of
+  one of the BRATS 2013 training data 
+  (specifically {\tt BRATS\_HG0001}):  (a) FLAIR, (b) T1, (c) T1C, and
+  (d) T2.  }
+  \label{fig:asymmetry}
+\end{figure}
+
+\setlength{\tabcolsep}{6pt}
+
+In order to better characterize deviations from normal brain shape 
+and appearance, several image features were derived using symmetric 
+population-specific multivariate templates \citep{avants2008,avants2010}.  
+For normal neuroanatomy, the use of spatial prior information 
+coupled with image normalization capabilities has proven useful 
+in producing improved segmentation results of ``expected'' brain tissue
+such as cerebrospinal fluid, gray matter, and white matter 
+\citep[e.g.,][]{ashburner1997}.  In contrast, accommodating spatial 
+priors to model the presence of a possible tumor and its constituent tissue 
+components is difficult. However, since the normal brain 
+exhibits a bilaterally symmetric organization, we can 
+use the presence of asymmetries to differentiate abnormal 
+brain tissue (i.e. tumor).  A similar motivation prompted
+the identification of the mid-sagittal plane of symmetry \citep{prima2002}
+for feature generation in MS lesion \citep{geremia2011} and 
+tumor \citep{geremia2012} identification.  However, this
+approach does not take into account the displacement of 
+normal tissue due to tumor growth causing the mid-sagittal plane
+to deform from its planar structure (cf Figure \ref{fig:asymmetry} (a)).
+
+
+To take into account these potential asymmetries, we 
+require a data set with the same modalities as dictated
+by the subject image acquisition protocol.  Although it
+would be preferable to build population-specific multivariate
+templates from normal data using the same acquisition 
+parameters, we substituted publicly available data 
+
+A recent neuroimaging reproducibility study
+by Landman et al. resulted in an open data cohort of 21
+normal individuals, each imaged twice, comprising several
+modalities including ASL, FLAIR, DTI, fMRI, T1, and T2 
+\citep{landman2011}.  These data (known as the
+``MMRR'' data set) were selected for deriving
+a multivariate template due to its public availability and
+inclusion of several modalities (even permitting future 
+incorporation of modalities 
+not currently included with the BRATS challenge into our 
+segmentation framework).  
+
+
+As detailed in \cite{avants2008,avants2010}, 
+given $K$ image modalities for $N$ subjects,  
+${\mathbf I} = \{I_1,I_2,\ldots, I_K\}$, multivariate 
+template construction iterates between optimizing the set 
+of diffeomorphic transforms between the subjects and the 
+template, 
+$\left\{\left(\phi_1,\phi_1^{-1}\right),\ldots,\left(\phi_N,\phi_N^{-1}\right)\right\}$ 
+and constructing the 
+optimal multivariate template appearance 
+$\mathbf{J}=\{J_1,J_2,\ldots, J_K\}$ to minimize the
+following cost function:
+\begin{align}
+  \sum_{n=1}^N 
+        \Bigg[ D &\left( \psi(\mathbf{x}),\phi_1^n(\mathbf{x},1)\right) \\ \nonumber 
+        +& \sum_{k=1}^K \lambda_k \Pi_k \left(I_k^n\left(\phi_n(\mathbf{x},0.5)\right),J_k\left(\phi^{-1}_n(\mathbf{x},0.5)\right)\right)\Bigg].
+\end{align}
+$D$ is the diffeomorphic shape distance,
+\begin{align}
+D\left( \phi( \mathbf{x},0),\phi( \mathbf{x},1)\right) = \int_0^1 \| \nu(\mathbf{x},t)\|_L dt
+\end{align}
+dependent on the choice of linear operator, $L$, and $\nu$
+is the velocity field
+\begin{align}
+\nu\left( \phi(\mathbf{x},t) \right) = \frac{d\phi(\mathbf{x},t)}{dt},\,\,\, \phi(\mathbf{x},0) = \mathbf{x}.
+\end{align}
+Each pairwise registration employing the similarity metric $\Pi_k$ can 
+be assigned a relative weighting, $\lambda_k$, to weight a particular
+modality's influence in the construction process.  Once the multivariate
+template has converged (typically four iterations are used), we symmetrize
+the template by flipping each image contralaterally and then running the
+multivariate template construction a second time using only the multivariate
+template and its symmetrical version.
+
+In terms of implementation, this template building algorithm is 
+encapsulated in the script \verb#antsMultivariateTemplateConstruction.sh#,
+available in the ANTs repository, which permits parallel processing on
+an individual workstation or on a large computational cluster.  In
+Figure \ref{fig:symmetrictemplates} we show mid-axial slices from
+the MMRR multivariate symmetrical template consisting of FA%
+\footnote{
+Although DTI-based images were not included in the
+challenge data, such images have shown discriminative potential 
+\citep[e.g.,][]{price2003} warranting investigation in our future
+work.  
+}, FLAIR,  
+T1, and T2 components.  These images have been made publicly available%
+\footnote{
+http://figshare.com/articles/Kirby\_multivariate\_template/852989.
+All 7 components are stored under the more informal ``Kirby'' moniker.
+}
+along with other processed images such as corresponding
+tissue priors and structural labels.
+
+{\color{red}{Need to describe the actual feature images}}
+
+
+
+\begin{figure}[htb]
+  \centering
+    \includegraphics[width=85mm]{Figures/templateKirby.pdf}
+  \caption{Multivariate symmetric template created from the MMRR 
+           data described in \cite{landman2011}.  Shown are the
+           (a) FA, (b) FLAIR, (c) MPRAGE, 
+           and (d) T2 template components.
+          }
+  \label{fig:symmetrictemplates}
+\end{figure}
+
+
+\begin{figure}[!htb]
+  \centering
+    \includegraphics[width=85mm]{Figures/asymmetryFeatureImages2.pdf}
+  \caption{ $S \underset{b}{\leftrightsquigarrow} \leftrightarrow T$
+          }
+  \label{fig:asymmetryFeatures}
+\end{figure}
+
+
+
+
+
+\subsection{Multi-Modal Feature Image Generation}
+
+%For both training and prediction protocols, feature images are generated
+%for each subject using the selected input MRI.  
+Key to any supervised regression or classification protocol are the 
+selected features for training and subsequent prediction.  Based on previous
+work and our own experience, the following feature images are generated
+for use in both training and prediction:
+\begin{itemize}
+  \item Per modality (FLAIR, T1, T1C, T2)
+    \begin{itemize}
+      \item First-order neighborhood statistical images:
+            mean, variance, skewness, and entropy. 
+            Neighborhood radius $\in \{1,3\}$.
+    \item GMM (stage 1) and MAP-MRF (stage 2) posteriors: CSF, gray matter, white 
+          matter, necrosis, edema, non-enhancing tumor and enhancing tumor (or a
+          subset for the simulated data).
+    \item GMM (stage 1) and MAP-MRF (stage 2) connected component geometry 
+          features:  distance to tumor core label, volume, volume to surface area ratio, eccentricity, and elongation
+    \item Template-based:  symmetric template difference and 
+          contralateral difference with Gaussian smoothing ($\sigma = 4$mm).
+    \end{itemize}
+  \item Miscellaneous: normalized Euclidean distance based on cerebral mask,
+    log Jacobian image, and  (T1 - T1C) difference image.
+\end{itemize}
+The generation of all feature images is performed using the available script 
+{\tt createFeatureImages.sh} which also preprocesses the input images performing N4
+bias correction \citep{tustison2010} and intensity rescaling to $[0,1]$.  Note that 
+it is easily expandable to include 
+additional modalities and/or neighborhood and smoothing parameters.
+In Figure \ref{fig:featureImages}
+we provide sample mid-axial slices from the BRATS\_HG0301
+data set from the Challenge cohort.  
+
+We previously mentioned that all data was provided already 
+skull-stripped.  However, we note to the reader that an
+available ANTs-based solution to the brain extraction problem
+is found in the script {\tt antsBrainExtraction.sh} which uses
+a hybrid approach based on image registration and binary morphology
+to isolate the brain \cite{avants2010a}.  We recently performed an evaluation of over 1200
+MRI which demonstrated performance that is comparable or better than
+other available methodology \cite{tustison2013a}.
+
+\begin{figure*}[htb]
+  \centering
+  \makebox[\textwidth][c]{
+  \includegraphics[width=180mm]{Figures/featureImages.pdf}
+  }
+  \caption{Representative feature images derived from the 
+           BRATS\_HG0301  ``challenge'' data set.
+           Neighborhood statistical images for each modality were 
+           generated by calculating a given statistic within
+           a specified neighborhood radius.  Also calculated for each modality were feature
+           images based on either the GMM or the MAP-MRF segmentation.  For the former, we
+           show the probability maps for each of the seven labels which are used as feature
+           images.  From the resulting hard segmentation, we calculate various geometric 
+           measures per connected component of each of the seven labels.  Similarly, the 
+           registration to the symmetric template produces the modality-specific 
+           difference images with the
+           corresponding symmetric template itself and with respect to the 
+           contralateral side.   
+           This mapping is also used to produce the log Jacobian image.  Finally, the 
+           (T1 - TC) image is calculated and, from the
+           cerebral mask, we calculate the normalized distance image.  
+           }
+  \label{fig:featureImages}         
+\end{figure*}
+
+
+
+\paragraph{Stage 1 (GMM)} \textcolor{red}{Need more descriptive
+  section name ... lots going on in the paper , easy to get disoriented}
+Prior cluster centers for specific tissue types learned from training data \citep{reynolds2009} are used in the GMM random forest stage to create 
+multiple feature images.  \textcolor{red}{FIXME I think this should be
+  expanded upon a bit ... can you be more specific?  how are these
+  cluster centers passed to the RF?  why are these centers portable to
+  this new data? etcetera.}
+Given $M$ tissue types, a GMM formulates the 
+probability distribution at each voxel, $\mathbf{x}$, as the
+sum of Gaussian components, $\mathcal{N}(\mathbf{x}|\mu,\sigma)$, i.e.
+\begin{align}
+p\left(\mathbf{x}|\mu_m,\sigma_m,\lambda_m\right) = \sum_{i=1}^M \lambda_m \mathcal{N}(\mathbf{x}|\mu_m,\sigma_m)
+\end{align}
+where $\sum_{m=1}^M \lambda_m = 1$.  One popular method for 
+determining the parameters of the GMM is maximum likelihood 
+estimation which can performed using the Atropos segmentation 
+tool \citep{avants2011} available in ANTs.  \textcolor{red}{FIXME
+  would prefer active voice version of the sentence to make clear that
+  Atropos uses EM} See Figure~\ref{fig:featureImages} for
+an example segmentation.  
+
+
+\textcolor{red}{should there be an RF model equation here?  i.e. what
+  exactly (in R) was used ?}
+
+\paragraph{Stage 2 (MAP-MRF):}
+
+Prediction during the GMM stage results in a set of random 
+forest voting classification maps giving a probabilistic estimate
+of the label value at each voxel.  \textcolor{red}{FIXME ---i think
+  this sentence is confusing ... did you already run the RF at this
+  point?  seems no ... but ``results in a set of RF voting
+  classification maps'' sounds like you already have them.}  These spatial probability
+maps can be used as spatial priors in a MAP-MRF segmentation
+estimation protocol also performed using the Atropos segmentation 
+tool \citep{avants2011} available in ANTs although we couple
+it with iterative bias correction as contained in the script
+{\tt antsAtroposN4.sh}.  The probabilistic output (and corresponding
+feature images) 
+for each modality are used to replace the analogous GMM-based feature images used 
+during the first stage of prediction along with the other feature
+images previously generated (such as the template-based data).
+We discovered that this composite application of random
+forest models improves the resulting labeled output.
+
+\textcolor{red}{ok ... but i still don't understand this ... it gives
+  me a vague idea ... can you sketch out the equations for these
+  features/predictors? and give better intuition of what the
+  ``composite'' RF (previously referred to as concatenated?) is?}
+
+For both stages, in contrast to previous generative
+modeling approaches for multi-modal tumor segmentation 
+\citep[e.g.,][]{prastawa2003}, we do not use multivariate 
+Gaussians to specify tissue probabilities but rather incorporate each
+univariate probability map into the feature vector of the training
+data.  As pointed out in \cite{menze2010}, multivariate modeling
+might obscure the distinct biological information provided by each 
+modality.  Instead, we let the random forest construction 
+process determine the optimal combination of such multivariate
+information.  Additionally, maximum posterior labeling from both stages
+is used to determine the connected components for each label.  
+Geometric features (assigned voxel-wise) include the physical volumes 
+of each connected component, the volume to surface area ratio, 
+the elongation, and eccentricity. 
+
+\paragraph{Neighborhood First-Order Statistic Feature Images}
+Similar to other work \cite{bauer2012,zikic2012} we calculated
+feature images using first order statistics such as mean, 
+variance, skewness, and entropy.  Images were created for 
+neighborhood radii of 1 and 3 voxels.
+
+\paragraph{Template-based Feature Images}
+Additional feature images are derived from the multivariate 
+symmetric template described earlier. The T1 images of the 
+subject and symmetric template are co-registered 
+\citep{tustison2013a} using the {\tt antsRegistration} 
+tool.  The motivation is similar in spirit to the method
+using reflection about the mid-sagittal plane described in 
+\cite{geremia2012}.  However, tumor growth often causes 
+distortion of the mid-plane thereby limiting the accuracy of
+this method.  By mapping to the symmetric template using the
+highly accurate SyN algorithm \cite{avants2011a}, we can 
+account for any distortion for comparing contralateral
+sides.
+
+Two images per modality use this derived mapping.  The modality-specific
+contralateral difference feature image is calculated by transforming
+the image to the symmetric template, flipping the image contralaterally,
+then transforming it back using the inverse transform, and subtracting
+the corresponding template component from the original image.  Additionally, 
+the template difference image is calculated by subtracting the warped template 
+image from the corresponding modality of the subject.
+
+\paragraph{Miscellaneous Feature Images}
+Three additional feature images are calculated which seem to aid in 
+classification as measured by the random forest variable importance
+(relative importance plots are provided in the Results section).
+First, the binary mask image is used to calculate the distance image 
+\citep{maurer2003}.  Second, from the symmetric template deformation 
+mapping we calculate the log Jacobian image.  Related to the earlier
+distance feature image, we calculate the distance mask image of the symmetric
+template and then warp that distance image to the individual subject
+for a third feature image.
+
+
+
+
+
+
+
+
+\subsection{Supervised Brain Tumor Segmentation with Concatenated Random Forests}
+\subsection{\textit{ANTsR}:  An ANTs/\textit{R} Interface}
+\subsection{MICCAI BRATS 2013 Brain Tumor Data}
+
+
+
+\clearpage
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
 
 \subsection{\textit{ANTsR}:  An ANTs/\textit{R} Interface}
 
@@ -327,6 +699,28 @@ optimization.%
 \footnote{
 http://www.numpy.org
 }  
+
+ANTs (Advanced Normalization Tools) was built, originally, to provide 
+high performance image registration for medical image analysis
+\citep{avants2008a} and based upon the mature Insight Toolkit (ITK)
+sponsored by the National Institutes of Health.  Since then, ANTs has grown to include 
+several robust medical image analysis solutions including bias 
+correction \citep{tustison2010}, $n$-tissue multivariate segmentation 
+\citep{avants2011}, template construction \citep{avants2010}, and cortical 
+thickness estimation \citep{das2009} (many of which have been
+introduced into ITK partially in an attempted leveraging of Linus's Law---``Given enough eyeballs, all bugs are shallow'').  
+However, in the evolution of the toolkit, it became clear 
+that robust statistical machinery was lacking for making inferences regarding
+the data produced during the course of ANTs processing.  \textit{ANTsR} was developed
+specifically to provide an interface between ANTs, a 
+powerful neuroimaging toolkit for producing reliable imaging data 
+transformations, and the \textit{R} project%
+\footnote{
+http://www.r-project.org
+}
+for statistical computing and visualization thus providing a complete
+set of tools for multivariate neuroimage analysis \textit{ANTsR} intends to provide a modern framework for medical analytics, with a focus on imaging-assisted prediction and statistical power.
+
 
 Careful consideration of available statistical software 
 led to the adoption of \textit{R} to complement ANTs quantification resulting in the
@@ -450,11 +844,11 @@ Supervised techniques generally consist of a training phase
 for model construction followed by prediction using the 
 generated model.  For supervised brain tumor segmentation, 
 a set of training data consisting of labeled brain images 
-(e.g. csf, gray matter, white matter, 
+(e.g., csf, gray matter, white matter, 
 necrosis, edema, enhancing and  non-enhancing tumor) is
 used to construct a predictive model.  Although other 
 classification techniques have been used to segment
-brain tumors (e.g. support vector machines \citep{bauer2011}),
+brain tumors (e.g., support vector machines \citep{bauer2011}),
 random forest models have proven particularly successful.
 
 Several machine learning concepts were integrated to create 
@@ -595,255 +989,17 @@ Normal brain tissue was not labeled.
 %segmentation \cite{avants2011} (encapsulated in the ANTs script 
 %\verb#antsAtroposN4.sh#).
 
+
+
+
+
+
 \subsubsection{Symmetric Multivariate Template Construction}
 
-\begin{figure}
-  \centering
-  \begin{tabular}{cc}
-    \includegraphics[width=40mm]{Figures/S_templateFA_140.png} &
-    \includegraphics[width=40mm]{Figures/S_templateFLAIR_140.png} \\
-    (a) & (b) \\
-    \includegraphics[width=40mm]{Figures/S_templateT1_140.png} &
-    \includegraphics[width=40mm]{Figures/S_templateT2_140.png} \\
-    (c) & (d) 
-  \end{tabular}
-  \caption{Multivariate symmetric template created from the Kirby 
-           21 data described in \cite{landman2011}.  Shown are the
-           (a) fractional anisotropy (FA), (b) FLAIR, (c) MPRAGE, 
-           and (d) T2 template components.
-          }
-  \label{fig:symmetrictemplates}
-\end{figure}
-
-In order to better characterize deviations from normal
-multi-modal brain shape and appearance, several features were derived 
-using population-specific multivariate template 
-construction. A recent neuroimaging reproducibility study
-by Landman et al. resulted in an open data cohort of 21
-normal individuals, each imaged twice, comprising several
-modalities including ASL, FLAIR, DTI, fMRI, T1, and T2 
-\cite{landman2011}.  These data (known informally as the
-``Kirby'' data set) were selected for deriving
-a multivariate template due to its public availability and
-inclusion of several modalities (even permitting future 
-incorporation into our segmentation framework of modalities 
-not currently included with the BRATS challenge).
-
-As detailed in \cite{avants2008,avants2010}, 
-given $K$ image modalities for $N$ subjects,  
-${\mathbf I} = \{I_1,I_2,\ldots, I_K\}$, multivariate 
-template construction iterates between optimizing the set 
-of diffeomorphic transforms between the subjects and the 
-template, 
-$\left\{\left(\phi_1,\phi_1^{-1}\right),\ldots,\left(\phi_N,\phi_N^{-1}\right)\right\}$ 
-and constructing the 
-optimal multivariate template appearance 
-$\mathbf{J}=\{J_1,J_2,\ldots, J_K\}$ to minimize the
-following cost function:
-\begin{align}
-  \sum_{n=1}^N 
-        \Bigg[ D &\left( \psi(\mathbf{x}),\phi_1^n(\mathbf{x},1)\right) \\ \nonumber 
-        +& \sum_{k=1}^K \lambda_k \Pi_k \left(I_k^n\left(\phi_n(\mathbf{x},0.5)\right),J_k\left(\phi^{-1}_n(\mathbf{x},0.5)\right)\right)\Bigg].
-\end{align}
-$D$ is the diffeomorphic shape distance,
-\begin{align}
-D\left( \phi( \mathbf{x},0),\phi( \mathbf{x},1)\right) = \int_0^1 \| \nu(\mathbf{x},t)\|_L dt
-\end{align}
-dependent on the choice of linear operator, $L$, and $\nu$
-is the velocity field
-\begin{align}
-\nu\left( \phi(\mathbf{x},t) \right) = \frac{d\phi(\mathbf{x},t)}{dt},\,\,\, \phi(\mathbf{x},0) = \mathbf{x}.
-\end{align}
-Each pairwise registration employing the similarity metric $\Pi_k$ can 
-be assigned a relative weighting, $\lambda_k$, to weight a particular
-modality's influence in the construction process.  
-
-In terms of implementation, this algorithm is 
-encapsulated in the script \verb#antsMultivariateTemplateConstruction.sh#,
-available in the ANTs repository, which permits parallel processing on
-an individual workstation or on a large computational cluster.  In
-Figure \ref{fig:symmetrictemplates} we show mid-axial slices from
-the Kirby multivariate symmetrical template consisting of FA, FLAIR,  
-T1, and T2 components.  Although DTI-based images were not included in the
-challenge data, such images have shown discriminative potential 
-\citep[e.g.][]{price2003} to warrant investigation in our future
-work.  The general procedure for const ructing a symmetric template involves flipping data around the mid-sagittal
-plane, as outlined in prior work
-\citep{Hopkins2013}. \textcolor{red}{FIXME-nick, is that correct? is
-  this covered in the scripts?  if so, where?}
-
-\subsubsection{Multi-Modal Feature Image Generation}
-
-\begin{figure*}
-  \centering
-  \makebox[\textwidth][c]{
-  \includegraphics[width=180mm]{Figures/featureImages.pdf}
-  }
-  \caption{Representative feature images derived from the 
-           BRATS\_HG0301  ``challenge'' data set.
-           Neighborhood statistical images for each modality were 
-           generated by calculating a given statistic within
-           a specified neighborhood radius.  Also calculated for each modality were feature
-           images based on either the GMM or the MAP-MRF segmentation.  For the former, we
-           show the probability maps for each of the seven labels which are used as feature
-           images.  From the resulting hard segmentation, we calculate various geometric 
-           measures per connected component of each of the seven labels.  Similarly, the 
-           registration to the symmetric template produces the modality-specific 
-           difference images with the
-           corresponding symmetric template itself and with respect to the 
-           contralateral side.   
-           This mapping is also used to produce the log Jacobian image.  Finally, the 
-           (T1 - TC) image is calculated and, from the
-           cerebral mask, we calculate the normalized distance image.  
-           }
-  \label{fig:featureImages}         
-\end{figure*}
-
-%For both training and prediction protocols, feature images are generated
-%for each subject using the selected input MRI.  
-Key to any supervised regression or classification protocol are the 
-selected features for training and subsequent prediction.  Based on previous
-work and our own experience, the following feature images are generated
-for use in both training and prediction:
-\begin{itemize}
-  \item Per modality (FLAIR, T1, T1C, T2)
-    \begin{itemize}
-      \item First-order neighborhood statistical images:
-            mean, variance, skewness, and entropy. 
-            Neighborhood radius $\in \{1,3\}$.
-    \item GMM (stage 1) and MAP-MRF (stage 2) posteriors: CSF, gray matter, white 
-          matter, necrosis, edema, non-enhancing tumor and enhancing tumor (or a
-          subset for the simulated data).
-    \item GMM (stage 1) and MAP-MRF (stage 2) connected component geometry 
-          features:  distance to tumor core label, volume, volume to surface area ratio, eccentricity, and elongation
-    \item Template-based:  symmetric template difference and 
-          contralateral difference with Gaussian smoothing ($\sigma = 4$mm).
-    \end{itemize}
-  \item Miscellaneous: normalized Euclidean distance based on cerebral mask,
-    log Jacobian image, and  (T1 - T1C) difference image.
-\end{itemize}
-The generation of all feature images is performed using the available script 
-{\tt createFeatureImages.sh} which also preprocesses the input images performing N4
-bias correction \citep{tustison2010} and intensity rescaling to $[0,1]$.  Note that 
-it is easily expandable to include 
-additional modalities and/or neighborhood and smoothing parameters.
-In Figure \ref{fig:featureImages}
-we provide sample mid-axial slices from the BRATS\_HG0301
-data set from the Challenge cohort.  
-
-We previously mentioned that all data was provided already 
-skull-stripped.  However, we note to the reader that an
-available ANTs-based solution to the brain extraction problem
-is found in the script {\tt antsBrainExtraction.sh} which uses
-a hybrid approach based on image registration and binary morphology
-to isolate the brain \cite{avants2010a}.  We recently performed an evaluation of over 1200
-MRI which demonstrated performance that is comparable or better than
-other available methodology \cite{tustison2013a}.
 
 
-\paragraph{Stage 1 (GMM)} \textcolor{red}{Need more descriptive
-  section name ... lots going on in the paper , easy to get disoriented}
-Prior cluster centers for specific tissue types learned from training data \citep{reynolds2009} are used in the GMM random forest stage to create 
-multiple feature images.  \textcolor{red}{FIXME I think this should be
-  expanded upon a bit ... can you be more specific?  how are these
-  cluster centers passed to the RF?  why are these centers portable to
-  this new data? etcetera.}
-Given $M$ tissue types, a GMM formulates the 
-probability distribution at each voxel, $\mathbf{x}$, as the
-sum of Gaussian components, $\mathcal{N}(\mathbf{x}|\mu,\sigma)$, i.e.
-\begin{align}
-p\left(\mathbf{x}|\mu_m,\sigma_m,\lambda_m\right) = \sum_{i=1}^M \lambda_m \mathcal{N}(\mathbf{x}|\mu_m,\sigma_m)
-\end{align}
-where $\sum_{m=1}^M \lambda_m = 1$.  One popular method for 
-determining the parameters of the GMM is maximum likelihood 
-estimation which can performed using the Atropos segmentation 
-tool \citep{avants2011} available in ANTs.  \textcolor{red}{FIXME
-  would prefer active voice version of the sentence to make clear that
-  Atropos uses EM} See Figure~\ref{fig:featureImages} for
-an example segmentation.  
 
 
-\textcolor{red}{should there be an RF model equation here?  i.e. what
-  exactly (in R) was used ?}
-
-\paragraph{Stage 2 (MAP-MRF):}
-
-Prediction during the GMM stage results in a set of random 
-forest voting classification maps giving a probabilistic estimate
-of the label value at each voxel.  \textcolor{red}{FIXME ---i think
-  this sentence is confusing ... did you already run the RF at this
-  point?  seems no ... but ``results in a set of RF voting
-  classification maps'' sounds like you already have them.}  These spatial probability
-maps can be used as spatial priors in a MAP-MRF segmentation
-estimation protocol also performed using the Atropos segmentation 
-tool \citep{avants2011} available in ANTs although we couple
-it with iterative bias correction as contained in the script
-{\tt antsAtroposN4.sh}.  The probabilistic output (and corresponding
-feature images) 
-for each modality are used to replace the analogous GMM-based feature images used 
-during the first stage of prediction along with the other feature
-images previously generated (such as the template-based data).
-We discovered that this composite application of random
-forest models improves the resulting labeled output.
-
-\textcolor{red}{ok ... but i still don't understand this ... it gives
-  me a vague idea ... can you sketch out the equations for these
-  features/predictors? and give better intuition of what the
-  ``composite'' RF (previously referred to as concatenated?) is?}
-
-For both stages, in contrast to previous generative
-modeling approaches for multi-modal tumor segmentation 
-\citep[e.g.][]{prastawa2003}, we do not use multivariate 
-Gaussians to specify tissue probabilities but rather incorporate each
-univariate probability map into the feature vector of the training
-data.  As pointed out in \cite{menze2010}, multivariate modeling
-might obscure the distinct biological information provided by each 
-modality.  Instead, we let the random forest construction 
-process determine the optimal combination of such multivariate
-information.  Additionally, maximum posterior labeling from both stages
-is used to determine the connected components for each label.  
-Geometric features (assigned voxel-wise) include the physical volumes 
-of each connected component, the volume to surface area ratio, 
-the elongation, and eccentricity. 
-
-\paragraph{Neighborhood First-Order Statistic Feature Images}
-Similar to other work \cite{bauer2012,zikic2012} we calculated
-feature images using first order statistics such as mean, 
-variance, skewness, and entropy.  Images were created for 
-neighborhood radii of 1 and 3 voxels.
-
-\paragraph{Template-based Feature Images}
-Additional feature images are derived from the multivariate 
-symmetric template described earlier. The T1 images of the 
-subject and symmetric template are co-registered 
-\citep{tustison2013a} using the {\tt antsRegistration} 
-tool.  The motivation is similar in spirit to the method
-using reflection about the mid-sagittal plane described in 
-\cite{geremia2012}.  However, tumor growth often causes 
-distortion of the mid-plane thereby limiting the accuracy of
-this method.  By mapping to the symmetric template using the
-highly accurate SyN algorithm \cite{avants2011a}, we can 
-account for any distortion for comparing contralateral
-sides.
-
-Two images per modality use this derived mapping.  The modality-specific
-contralateral difference feature image is calculated by transforming
-the image to the symmetric template, flipping the image contralaterally,
-then transforming it back using the inverse transform, and subtracting
-the corresponding template component from the original image.  Additionally, 
-the template difference image is calculated by subtracting the warped template 
-image from the corresponding modality of the subject.
-
-\paragraph{Miscellaneous Feature Images}
-Three additional feature images are calculated which seem to aid in 
-classification as measured by the random forest variable importance
-(relative importance plots are provided in the Results section).
-First, the binary mask image is used to calculate the distance image 
-\citep{maurer2003}.  Second, from the symmetric template deformation 
-mapping we calculate the log Jacobian image.  Related to the earlier
-distance feature image, we calculate the distance mask image of the symmetric
-template and then warp that distance image to the individual subject
-for a third feature image.
 
 \subsubsection{Training:  Random Forest Model Creation}
 
@@ -984,7 +1140,7 @@ on the cluster, creating the feature images for a single subject required
 approximately 2 hours of total processing time of which the template registration 
 component took approximately 75\%.  Additionally, the first order 
 statistical features also seemed fairly important which is something that
-previous work had demonstrated \citep[e.g.][]{bauer2012,zikic2012}.
+previous work had demonstrated \citep[e.g.,][]{bauer2012,zikic2012}.
 There are a number of differences, however, between low-grade and high-grade 
 importance outcomes which would also seem to justify the creation of separate
 glioma class models.
