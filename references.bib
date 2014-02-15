@@ -2,12 +2,30 @@
 %% http://bibdesk.sourceforge.net/
 
 
-%% Created for Nick Tustison at 2014-02-03 15:58:56 -0500 
+%% Created for Nick Tustison at 2014-02-13 11:03:51 -0500 
 
 
 %% Saved with string encoding Unicode (UTF-8) 
 
 
+
+@article{tustison2013a,
+	Abstract = {Diffeomorphic mappings are central to image registration due largely to their topological properties and success in providing biologically plausible solutions to deformation and morphological estimation problems. Popular diffeomorphic image registration algorithms include those characterized by time-varying and constant velocity fields, and symmetrical considerations. Prior information in the form of regularization is used to enforce transform plausibility taking the form of physics-based constraints or through some approximation thereof, e.g., Gaussian smoothing of the vector fields [a la Thirion's Demons (Thirion, 1998)]. In the context of the original Demons' framework, the so-called directly manipulated free-form deformation (DMFFD) (Tustison et al., 2009) can be viewed as a smoothing alternative in which explicit regularization is achieved through fast B-spline approximation. This characterization can be used to provide B-spline "flavored" diffeomorphic image registration solutions with several advantages. Implementation is open source and available through the Insight Toolkit and our Advanced Normalization Tools (ANTs) repository. A thorough comparative evaluation with the well-known SyN algorithm (Avants et al., 2008), implemented within the same framework, and its B-spline analog is performed using open labeled brain data and open source evaluation tools.},
+	Author = {Tustison, Nicholas J and Avants, Brian B},
+	Date-Added = {2014-02-13 16:03:31 +0000},
+	Date-Modified = {2014-02-13 16:03:46 +0000},
+	Doi = {10.3389/fninf.2013.00039},
+	Journal = {Front Neuroinform},
+	Journal-Full = {Frontiers in neuroinformatics},
+	Keywords = {Advanced normalization tools; Insight Toolkit; diffeomorphisms; directly manipulated free-form deformation; spatial normalization},
+	Pages = {39},
+	Pmc = {PMC3870320},
+	Pmid = {24409140},
+	Pst = {epublish},
+	Title = {Explicit B-spline regularization in diffeomorphic image registration},
+	Volume = {7},
+	Year = {2013},
+	Bdsk-Url-1 = {http://dx.doi.org/10.3389/fninf.2013.00039}}
 
 @article{prima2002,
 	Abstract = {We present a new method to automatically compute, reorient, and recenter the mid-sagittal plane in anatomical and functional three-dimensional (3-D) brain images. This iterative approach is composed of two steps. At first, given an initial guess of the mid-sagittal plane (generally, the central plane of the image grid), the computation of local similarity measures between the two sides of the head allows to identify homologous anatomical structures or functional areas, by way of a block matching procedure. The output is a set of point-to-point correspondences: the centers of homologous blocks. Subsequently, we define the mid-sagittal plane as the one best superposing the points on one side and their counterparts on the other side by reflective symmetry. Practically, the computation of the parameters characterizing the plane is performed by a least trimmed squares estimation. Then, the estimated plane is aligned with the center of the image grid, and the whole process is iterated until convergence. The robust estimation technique we use allows normal or abnormal asymmetrical structures or areas to be treated as outliers, and the plane to be mainly computed from the underlying gross symmetry of the brain. The algorithm is fast and accurate, even for strongly tilted heads, and even in presence of high acquisition noise and bias field, as shown on a large set of synthetic data. The algorithm has also been visually evaluated on a large set of real magnetic resonance (MR) images. We present a few results on isotropic as well as anisotropic anatomical (MR and computed tomography) and functional (single photon emission computed tomography and positron emission tomography) real images, for normal and pathological subjects.},
@@ -611,14 +629,6 @@ system as an ongoing benchmarking resource.}},
 	Volume = {5},
 	Year = {1990},
 	Bdsk-Url-1 = {http://ws.isiknowledge.com/cps/openurl/service?url_ver=Z39.88-2004&rft_id=info:ut/A1990DR72200005}}
-
-@article{tustison2013a,
-	Author = {N. J. Tustison and B. B. Avants},
-	Date-Added = {2013-11-03 21:33:41 +0000},
-	Date-Modified = {2013-11-03 22:55:09 +0000},
-	Journal = {Front Neurosci},
-	Title = {Explicit {B}-spline regularization in diffeomorphic image registration},
-	Year = {submitted}}
 
 @article{tustison2010,
 	Abstract = {A variant of the popular nonparametric nonuniform intensity normalization (N3) algorithm is proposed for bias field correction. Given the superb performance of N3 and its public availability, it has been the subject of several evaluation studies. These studies have demonstrated the importance of certain parameters associated with the B-spline least-squares fitting. We propose the substitution of a recently developed fast and robust B-spline approximation routine and a modified hierarchical optimization scheme for improved bias field correction over the original N3 algorithm. Similar to the N3 algorithm, we also make the source code, testing, and technical documentation of our contribution, which we denote as "N4ITK," available to the public through the Insight Toolkit of the National Institutes of Health. Performance assessment is demonstrated using simulated data from the publicly available Brainweb database, hyperpolarized (3)He lung image data, and 9.4T postmortem hippocampus data.},
