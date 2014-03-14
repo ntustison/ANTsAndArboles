@@ -201,10 +201,14 @@ asymmetry across different imaging modalities.  We describe how we
 employ symmetric multimodal brain templates to derive these
 performance critical features and how these features are used within
 successive applications of random forest models for increasing levels
-of feature refinement, i.e. \textit{concatenated random forests}.  Although the derived workflow involves many components, the newly developed \textit{ANTsR} open source software package significantly facilitates the proposed methodology.  \textit{ANTsR}
+of feature refinement, i.e. \textit{concatenated random forests}.  Although the derived 
+workflow involves many components, the newly developed \textit{ANTsR} open source software 
+package significantly facilitates the proposed methodology.  \textit{ANTsR}
 integrates Advanced Normalization Tools (ANTs) with \textit{R}'s
 cutting-edge statistical and machine learning techniques and state-of-the-art visualization possibilities.  
-The reported algorithmic framework was the top-performing entry in the MICCAI 2013 Multimodal Brain Tumor Segmentation challenge and, to our knowledge, is the only entry for both challenge years (2012 and 2013) which has been made publicly available.
+The reported algorithmic framework was the top-performing entry in the MICCAI 2013 Multimodal Brain Tumor 
+Segmentation challenge and, to our knowledge, is the only entry for both challenge years (2012 and 2013) 
+which has been made publicly available.
 \end{abstract}
 
 \begin{keyword}
@@ -576,7 +580,8 @@ the T2 symmetric template voxelwise difference image is calculated from
 Note that the T1-weighted contrast and non-contrast images are paired with
 the T1-weighted component of the symmetric template.  The second
 set of template-based feature images is generated per modality 
-as the difference image with the contralateral reflection.  This is achieved by calculating the reflection transform, $T_R$, in the symmetric template space and composing transforms
+as the difference image with the contralateral reflection.  This is achieved by calculating the 
+reflection transform, $T_R$, in the symmetric template space and composing transforms
 as follows to create the non-Euclidean contralateral counterpart per modality:
 \begin{align}
   S_{contralateral} = S\left( \phi_b^{-1}\left( T_R\left( \phi_b \right)\right)\right).
@@ -836,7 +841,7 @@ adoption within both academia and industry.
 
 The \textit{ANTsR} package is publicly available on the github project hosting service.%
 \footnote{
-\href{https://github.com/stnava/\textit{ANTsR}}{https://github.com/stnava/\textit{ANTsR}}
+\href{https://github.com/stnava/ANTsR}{https://github.com/stnava/ANTsR}
 }
 Prior to installation of \textit{ANTsR}, several external R packages
 need to be installed including: \verb#Rcpp#, \verb#signal#, \verb#timeSeries#, 
