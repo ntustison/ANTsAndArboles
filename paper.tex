@@ -345,7 +345,11 @@ whereby the output probability images from the application of the first
 RF model seeds the construction of a subset of new feature images
 for input into the second stage.  The results of the second RF model
 are then refined using a series of heuristically-derived binary morphological
-operations.
+operations.  \textcolor{red}{The two-stage approach is motivated by
+the fact that the RF is a powerful tool for ranking the features
+in a high-dimensional model i.e. can be used for model selection.
+However, the RF outputs are not geometrically constrained, which is
+the motivation for our second refinement step.}.
 
 In line with our philosophy regarding open science \citep{tustison2013,ince2012}, 
 we made the code available as open source%
@@ -504,7 +508,7 @@ $\left\{\left(\phi_1,\phi_1^{-1}\right),\ldots,\left(\phi_N,\phi_N^{-1}\right)\r
 and constructing the 
 optimal multivariate template appearance 
 $\mathbf{J}=\{J_1,J_2,\ldots, J_K\}$ to minimize the
-following cost function:
+following cost function \textcolor{red}{not sure the 2nd term is correct...}:
 \begin{align}
   \sum_{n=1}^N 
         \left[ D \left( \psi(\mathbf{x}),\phi_1^n(\mathbf{x},1)\right)  
@@ -632,6 +636,13 @@ second stage),
 the output of which constitute the final tumor segmentation estimate.
 Note that some feature images are included in both stages such as
 the asymmetry features described in the previous section.
+\textcolor{red}{Nick, I think the motivation for this is still unclear
+  .... doesnt it have something to do with the MRF of atropos
+  smoothing out the importance features resulting from the RF step?
+  Figure 4 tells us a little bit about the procedure of the code but
+  the idea is not conveyed ... would it be possible to show exactly
+  what is happening in a separate figure?  e.g. just conceptually in a small 
+  region of voxels with 2 modalities ....?}
 
 For both stages, in contrast to previous generative
 modeling approaches for multimodal tumor segmentation 
@@ -648,7 +659,8 @@ Geometric features (assigned voxel-wise) include the physical volumes
 of each connected component, the volume to surface area ratio, 
 the elongation, and eccentricity. 
 
-\paragraph{Stage 1 (GMM)}
+
+\paragraph{Stage 1 (GMM)} \textcolor{red}{more descriptive name}
 Gaussian mixture modeling (GMM) is used to assign voxelwise
 tissue probabilities which comprise an additional set of image features 
 where 
@@ -694,6 +706,20 @@ set of $\left\{F_i: i \in Asym\right\}$ are the feature images
 generated from the symmetric multivariate template 
 described in the previous section and $\left\{F_i: i \in Misc\right\}$
 are miscellaneous  feature images described in Section \ref{sec:misc}.
+
+
+\textcolor{red}{still feel unclear about it ...  does it go like this?
+\begin{enumerate}
+\item use tissue prior intensity models (not spatial) to initialize
+  Atropos multivariate EM-MRF segmentation of new image  w/o spatial
+  priors 
+\item get out segmentation and posteriors ... run some shape stats on
+  the segmentation 
+\item separately compute the asymmetry features by mapping to the MV
+  template 
+\item input  asymmFeatures + atroposPosteriors + shapeFeatures to the
+  RF model  ... with or w/o ground truth outcomes ?  same either way?
+\end{enumerate}
 
 \paragraph{Stage 2 (MAP-MRF)}
 
