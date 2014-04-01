@@ -174,19 +174,34 @@
 
 
 \begin{abstract} 
-Automated brain tumor segmentation in MRI is complicated by the lack of prior knowledge 
-concerning tumor location, spatial extent, shape, possible displacement of normal 
-tissue, and intensity signature, all of which limit 
-the applicability of well-established techniques that have demonstrated good performance 
-in related tasks such as normal brain tissue segmentation.  Due to this 
-limitation, we localize our prior knowledge strategy through the 
-use of subject-specific multimodal asymmetrical features which demonstrate excellent
-discriminative properties within the random forest machine learning framework.  
-This approach is made possible with symmetric multimodal brain templates which
-are optimal in terms of both shape and multivariate intensity.  Further performance improvements are demonstrated by a successive application of random forest models for increasing levels of feature refinement 
- to which we refer as {\it concatenated random forests}.  Although the derived workflow involves many disparate components, the newly developed ANTsR open source software package significantly facilitates the proposed methodology.  ANTsR, a comprehensive interface of the popular Advanced Normalization Tools (ANTs) repository with the R statistical project,
-integrates well-performing image analysis tools such as image registration, segmentation, bias correction, and template building with access to advanced statistical and machine learning techniques as well as state-of-the-art visualization possibilities.  
-The reported algorithmic framework was the top-performing entry in the MICCAI 2013 Multimodal Brain Tumor Segmentation challenge and, to our knowledge, is the only entry for both challenge years (2012 \& 2013) which has been made publicly available.
+Automated brain tumor segmentation in MRI is complicated by the lack
+of prior knowledge concerning tumor location, spatial extent, shape,
+possible displacement of normal tissue, and intensity signature.
+These factors limit the applicability of techniques with established
+performance in related tasks such as normal brain tissue segmentation.
+We introduce a template-based framework for computing geometric and
+asymmetry-driven feature sets from multiple modality neuroimaging.  We
+use these features to drive a supervised whole-brain and tumor segmentation
+approach based on random forests.  The asymmetry-related features 
+demonstrate excellent discriminative properties within this framework. 
+This approach is made possible by symmetric multimodality brain templates which are optimal
+in terms of both shape and multivariate intensity.  Further
+performance improvements are demonstrated by a successive application
+of random forest models for increasing levels of feature refinement to
+which we refer as {\it concatenated random forests}.  Although the
+derived workflow involves many disparate components, the newly
+developed \textit{ANTsR} open source software package significantly facilitates
+the proposed methodology.  \textit{ANTsR} is a comprehensive interface between the
+popular Advanced Normalization Tools (ANTs) and the \textit{R}
+statistical project. \textit{ANTsR} integrates proven image analysis methods
+for image registration, segmentation, bias correction, and
+template building with \textit{R}'s statistical and machine
+learning techniques and state-of-the-art visualization possibilities.  
+The reported algorithmic framework was the
+top-performing entry in the MICCAI 2013 Multimodal Brain Tumor
+Segmentation challenge and, to our knowledge, is the only entry for
+both challenge years (2012 \& 2013) which has been made publicly
+available.
 \end{abstract}
 
 \begin{keyword}
