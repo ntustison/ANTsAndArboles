@@ -719,12 +719,15 @@ are miscellaneous  feature images described in Section \ref{sec:misc}.
   template 
 \item input  asymmFeatures + atroposPosteriors + shapeFeatures to the
   RF model  ... with or w/o ground truth outcomes ?  same either way?
+  what do you get out of the RF?
 \end{enumerate}
 
 \paragraph{Stage 2 (MAP-MRF)}
 
 Application of the Stage 1 RF model results in a set of
 probabilistic estimates for each of the seven tissue types.  
+\textcolor{red}{can you say more here --- what are these in RF and R
+  terms?  how the RF generate probabilities ?}
 At the beginning of the second stage, these spatial probability maps are 
 used as spatial priors in a 
 MAP-MRF segmentation also performed using the Atropos 
@@ -742,6 +745,11 @@ The second stage RF model is then produced similarly as the previous stage:
 \end{align}
 We discovered that this composite application of random
 forest models improves the resulting labeled output.
+\textcolor{red}{Is this so much a discovery or is it that the MRF
+  features ``fix'' the RF output by introducing spatial coherence to
+  the results .... at least , that's what it seems to me that you are
+  doing ...}
+
 
 \subsubsection{Miscellaneous Multimodal Feature Image Generation}
 \label{sec:misc}
