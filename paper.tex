@@ -151,7 +151,7 @@
 
 \begin{frontmatter}
 
-\title{Optimal Symmetric Multimodal Templates and Concatenated Random Forests for Supervised Brain Tumor Segmentation (Simplified) with ANTsR}
+\title{Optimal Symmetric Multimodal Templates and Concatenated Random Forests for Supervised Brain Tumor Segmentation (Simplified) with \textit{ANTsR}}
 
 \author[label1]{Nicholas J.~Tustison
   \fnref{label0}}
@@ -359,7 +359,7 @@ on the well-vetted and open source Insight Toolkit (ITK)%
 \footnote{
 http://www.itk.org/
 } 
-of the National Institutes of Health and is available through our ANTsR 
+of the National Institutes of Health and is available through our \textit{ANTsR} 
 package.
 In subsequent sections we describe in greater detail the automated 
 supervised brain segmentation pipeline including the generation of asymmetry
@@ -398,7 +398,7 @@ protocol including:
   \item prediction using the proposed framework.
 \end{itemize}
 In subsequent sections, we describe these items and detail the
-ANTsR framework which coordinates all steps.
+\textit{ANTsR} framework which coordinates all steps.
 
 \subsection{Image Features for RF Model Training and Prediction}
 
@@ -573,7 +573,8 @@ the T2 symmetric template voxelwise difference image is calculated from
 Note that the T1-weighted contrast and non-contrast images are paired with
 the T1-weighted component of the symmetric template.  The second
 set of template-based feature images is generated per modality 
-as the difference image with the contralateral reflection.  This is achieved by calculating the reflection transform, $T_R$, in the symmetric template space and composing transforms
+as the difference image with the contralateral reflection.  This is achieved by calculating the 
+reflection transform, $T_R$, in the symmetric template space and composing transforms
 as follows to create the non-Euclidean contralateral counterpart per modality:
 \begin{align}
   S_{contralateral} = S\left( \phi_b^{-1}\left( T_R\left( \phi_b \right)\right)\right).
@@ -737,10 +738,10 @@ and generates all feature images.  In Figure \ref{fig:featureImages} we provide 
 image slices from features generated from the {\tt BRATS\_HG0301} data set.
 
 \begin{figure*}[h]
-  \centering
-  \makebox[0.9\textwidth][c]{
+%  \centering
+%  \makebox[0.9\textwidth][c]{
   \includegraphics[width=150mm]{Figures/featureImages.pdf}
-  }
+%  }
   \caption{Representative feature images derived from the 
            BRATS\_HG0301  ``challenge'' data set.
            Neighborhood statistical images for each modality were 
@@ -762,7 +763,7 @@ image slices from features generated from the {\tt BRATS\_HG0301} data set.
 \end{figure*}
 
 
-\subsection{ANTsR:  An ANTs/R Interface}
+\subsection{\textit{ANTsR}:  An ANTs/R Interface}
 
 \subsubsection{Overview}
 
@@ -801,7 +802,7 @@ thickness estimation \citep{das2009} (many of which have been
 introduced into ITK partially in an attempted leveraging of Linus's Law---``Given enough eyeballs, all bugs are shallow'').  
 However, in the evolution of the toolkit, it became clear 
 that robust statistical machinery was lacking for making inferences regarding
-the data produced during the course of ANTs processing.  ANTsR was developed
+the data produced during the course of ANTs processing.  \textit{ANTsR} was developed
 specifically to provide an interface between ANTs, a 
 powerful neuroimaging toolkit for producing reliable imaging data 
 transformations, and the R project%
@@ -810,13 +811,13 @@ http://www.r-project.org
 }
 for statistical computing and visualization thus providing a complete
 set of tools for multivariate neuroimage analysis.  
- ANTsR intends to provide a modern framework for medical analytics, 
+ \textit{ANTsR} intends to provide a modern framework for medical analytics, 
  with a focus on imaging-assisted prediction and statistical power.
 
 
 Careful consideration of available statistical software 
 led to the adoption of R to complement ANTs quantification resulting in the
-ANTsR package.
+\textit{ANTsR} package.
 %The R project for statistical computing,%
 %\footnote{
 %www.r-project.org
@@ -831,11 +832,11 @@ adoption within both academia and industry.
 
 \subsubsection{Installation}
 
-The ANTsR package is publicly available on the github project hosting service.%
+The \textit{ANTsR} package is publicly available on the github project hosting service.%
 \footnote{
 \href{https://github.com/stnava/ANTsR}{https://github.com/stnava/ANTsR}
 }
-Prior to installation of ANTsR, several external R packages
+Prior to installation of \textit{ANTsR}, several external R packages
 need to be installed including: \verb#Rcpp#, \verb#signal#, \verb#timeSeries#, 
 \verb#mFilter#, \verb#doParallel#, \verb#robust#, \verb#magic#, \verb#knitr#, \verb#pixmap#, 
 \verb#rgl#, and \verb#misc3d#.%  
@@ -863,15 +864,15 @@ such as the Insight Toolkit (ITK)%
 http://www.itk.org/
 }
 and ANTs.  Further instructions for download and
-installation can be found on the ANTsR github website.  Feel
+installation can be found on the \textit{ANTsR} github website.  Feel
 free to contact the authors if installation trouble occurs.  We note
-that ANTsR is currently only tested on UNIX-alikes such OSX and Ubuntu
+that \textit{ANTsR} is currently only tested on UNIX-alikes such OSX and Ubuntu
 operating systems.%  
 \footnote{Windows installation should be possible
 but, to our knowledge, has not been attempted.}
 
 \subsubsection{Usage}
-ANTsR is intended to not only allow easy interchange between
+\textit{ANTsR} is intended to not only allow easy interchange between
 medical imaging formats and R but also to facilitate
 reproducible scientific studies and the type compilable analysis
 articles that are fundamental to journals such as
@@ -879,7 +880,7 @@ articles that are fundamental to journals such as
 facilitate integration of R-code with the LaTeX document
 preparation system.  
 
-An additional motivation for our development of ANTsR (and
+An additional motivation for our development of \textit{ANTsR} (and
 hopefully its acceptance by the community) 
 stems from the ability to couple ANTs core 
 functionality, including IO tools such as \verb#antsImageRead#, 
@@ -895,15 +896,15 @@ constituent functions are invoked in the similar manner as other
 R libraries.
 
 As mentioned earlier, we have made this entire framework
-available as open source.  In addition to the ANTsR repository
-already on github which houses both ANTs and ANTsR functionality, 
+available as open source.  In addition to the \textit{ANTsR} repository
+already on github which houses both ANTs and \textit{ANTsR} functionality, 
 we created a special github repository specifically for this work
 containing figures, references, and text.%
 \footnote{
 \href{https://github.com/ntustison/ANTsAndArboles}{https://github.com/ntustison/ANTsAndArboles}
 }
 Also, we posted all
-scripts (R, shell, and perl) used to coordinate the ANTsR processing 
+scripts (R, shell, and perl) used to coordinate the \textit{ANTsR} processing 
 including:
 \begin{itemize}
   \item {\tt applyModel.R}:  applies a RF model to a new 
@@ -1209,8 +1210,8 @@ constructive feedback to the authors thereby improving the original offering.
 
 However, as explained previously, the brain tumor segmentation 
 methodology that we have made available is only a small part of the 
-larger software package that we have created in ANTsR.  Not only does
-ANTsR significantly facilitate the development of the work discussed,
+larger software package that we have created in \textit{ANTsR}.  Not only does
+\textit{ANTsR} significantly facilitate the development of the work discussed,
 but it provides an interface to one of the most powerful statistical
 packages available in R.  The combination of the well-known ANTs software
 package with R provides tremendous potential for future insightful analysis.
@@ -1225,26 +1226,4 @@ package with R provides tremendous potential for future insightful analysis.
 
 \bibliographystyle{elsarticle-harv}
 \bibliography{references}
-
-
-%% Authors are advised to submit their bibtex database files. They are
-%% requested to list a bibtex style file in the manuscript if they do
-%% not want to use model1-num-names.bst.
-
-%% References without bibTeX database:
-
-% \begin{thebibliography}{00}
-
-%% \bibitem must have the following form:
-%%   \bibitem{key}...
-%%
-
-% \bibitem{}
-
-% \end{thebibliography}
-
-
 \end{document}
-
-%%
-%% End of file `elsarticle-template-1-num.tex'.
