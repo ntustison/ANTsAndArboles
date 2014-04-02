@@ -205,7 +205,7 @@ available.
 \end{abstract}
 
 \begin{keyword}
-advanced normalization tools \sep BRATS \sep brain tumor segmentation \sep R project for statistical computing
+advanced normalization tools \sep BRATS \sep brain tumor segmentation \sep \textit{R} project for statistical computing
 %% keywords here, in the form: keyword \sep keyword
 \end{keyword}
 
@@ -300,9 +300,9 @@ random sampling of the training data) was
 introduced by Breiman \citep{breiman1996} to achieve improved
 accuracy.%
 \footnote{
-One of the principal advantages of R is the extensive community of
+One of the principal advantages of \textit{R} is the extensive community of
 developers  who have contributed on the order of thousands of packages 
-extending R 's capabilities beyond its core functionality.
+extending \textit{R} 's capabilities beyond its core functionality.
 Most relevant here
 is the {\tt randomForest} package developed from Breiman's original
 Fortran code by Liaw and Wiener \citep{liaw2002}.
@@ -702,7 +702,7 @@ the Stage 1 RF model using the following relationship
 \label{eq:gmm}
 \mathrm{Tissue}\,\,\mathrm{classes} \sim \sum_{i \in GMM} F_i + \sum_{i \in Asym} F_i + \sum_{i \in Misc} F_i
 \end{align}
-given in the standard R notation of \cite{wilkinson1973}.  The
+given in the standard \textit{R} notation of \cite{wilkinson1973}.  The
 set of $\left\{F_i: i \in Asym\right\}$ are the feature images 
 generated from the symmetric multivariate template 
 described in the previous section and $\left\{F_i: i \in Misc\right\}$
@@ -800,8 +800,8 @@ image slices from features generated from the {\tt BRATS\_HG0301} data set.
 
 
 \subsection{\textit{ANTsR}:  An ANTs/R Interface}
-
-\textcolor{red}{read to here}
+We briefly describe our imaging-specific interface between
+\textit{ANTs} and \textit{R}.
 
 \subsubsection{Overview}
 
@@ -843,7 +843,7 @@ that robust statistical machinery was lacking for making inferences regarding
 the data produced during the course of ANTs processing.  \textit{ANTsR} was developed
 specifically to provide an interface between ANTs, a 
 powerful neuroimaging toolkit for producing reliable imaging data 
-transformations, and the R project%
+transformations, and the \textit{R} project%
 \footnote{
 http://www.r-project.org
 }
@@ -854,16 +854,16 @@ set of tools for multivariate neuroimage analysis.
 
 
 Careful consideration of available statistical software 
-led to the adoption of R to complement ANTs quantification resulting in the
+led to the adoption of \textit{R} to complement ANTs quantification resulting in the
 \textit{ANTsR} package.
-%The R project for statistical computing,%
+%The \textit{R} project for statistical computing,%
 %\footnote{
 %www.r-project.org
 %}
 % or more compactly
 %`R', is an environment for statistical computation
 %and data visualization.  
-R's open source code base, reliable software testing and distribution strategies,
+\textit{R}'s open source code base, reliable software testing and distribution strategies,
 and add-on packages coupled with its rapidly growing 
 community of developers and users has caused wide-scale
 adoption within both academia and industry.
@@ -874,7 +874,7 @@ The \textit{ANTsR} package is publicly available on the github project hosting s
 \footnote{
 \href{https://github.com/stnava/ANTsR}{https://github.com/stnava/ANTsR}
 }
-Prior to installation of \textit{ANTsR}, several external R packages
+Prior to installation of \textit{ANTsR}, several external \textit{R} packages
 need to be installed including: \verb#Rcpp#, \verb#signal#, \verb#timeSeries#, 
 \verb#mFilter#, \verb#doParallel#, \verb#robust#, \verb#magic#, \verb#knitr#, \verb#pixmap#, 
 \verb#rgl#, and \verb#misc3d#.%  
@@ -886,10 +886,10 @@ in later sections, one needs to also install the packages
 \verb#randomForest#, \verb#snowfall#, \verb#rlecuyer#,
 and \verb#ggplot2#.%
 \footnote{
-Packages are easily installed using the {\tt install.packages()} R mechanism.
+Packages are easily installed using the {\tt install.packages()} \textit{R} mechanism.
 } 
 
-In addition to R and the add-on packages previously mentioned, CMake is also 
+In addition to \textit{R} and the add-on packages previously mentioned, CMake is also 
 required.  CMake%
 \footnote{
 http://www.cmake.org/
@@ -911,7 +911,7 @@ but, to our knowledge, has not been attempted.}
 
 \subsubsection{Usage}
 \textit{ANTsR} is intended to not only allow easy interchange between
-medical imaging formats and R but also to facilitate
+medical imaging formats and \textit{R} but also to facilitate
 reproducible scientific studies and the type compilable analysis
 articles that are fundamental to journals such as
 \textit{Biostatistics}.  Both \verb#knitr# and \verb#sweave#
@@ -922,7 +922,7 @@ An additional motivation for our development of \textit{ANTsR} (and
 hopefully its acceptance by the community) 
 stems from the ability to couple ANTs core 
 functionality, including IO tools such as \verb#antsImageRead#, 
-with the large number of R statistical and
+with the large number of \textit{R} statistical and
 visualization packages.  Due to this combination, several
 functions have been easily created for such neuroimaging-specific 
 tasks as fMRI/ASL data manipulation and analysis,
@@ -1023,7 +1023,7 @@ necrosis, edema, enhancing, and non-enhancing tumor characterizing each brain.
 Initial testing of our proposed framework was performed 
 on the training data using a leave-one-out strategy.  Once the
 feature images are created for each subject, the resulting images of the entire
-training cohort are organized in a csv file for input into the R script
+training cohort are organized in a csv file for input into the \textit{R} script
 {\tt createModel.R}.  Other possible input parameters include the requested 
 number of trees, number of samples per label, and number of threads for parallel
 processing.  The output is an {\tt RData} file describing the RF
@@ -1032,7 +1032,7 @@ model which can be used for future predictions.
 Additionally, the {\tt randomForest} package provides  measurements 
 for determining the importance of chosen features when constructing the model.  
 This aids in potential feature pruning or intuiting model behavior.  As mentioned
-earlier, we provide the R script {\tt plotVariableImportance.R} to render
+earlier, we provide the \textit{R} script {\tt plotVariableImportance.R} to render
 one such quantity denoted as {\tt MeanDecreaseAccuracy}.  During model construction
 (specifically the out-of-bag error calculation stage), the decrease in prediction accuracy
 with the omission of a single feature or variable is tracked and averaged.  Thus,
@@ -1252,7 +1252,7 @@ larger software package that we have created in \textit{ANTsR}.  Not only does
 \textit{ANTsR} significantly facilitate the development of the work discussed,
 but it provides an interface to one of the most powerful statistical
 packages available in R.  The combination of the well-known ANTs software
-package with R provides tremendous potential for future insightful analysis.
+package with \textit{R} provides tremendous potential for future insightful analysis.
 
 
 
