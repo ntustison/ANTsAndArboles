@@ -5,7 +5,7 @@ VERSION="0.0"
 ## need to change so that SCRIPTSPATH is where createFeatureImages.sh
 ## and the other scripts are located.
 
-SCRIPTSPATH=/Users/ntustison/Documents/Academic/SubmittedPapers/BRATS2013/Scripts/
+SCRIPTSPATH=`dirname "$(readlink -f "$0")"`
 
 if [[ ! -d "$ANTSPATH" ]];
   then
@@ -36,7 +36,7 @@ Usage:
 
 Example:
 
-  bash $0
+  sh $0
           -d 3
           -m /home/njt4n/share/Data/Tumor/BRATS-1/Model/highGradeModel.RData
           -x /home/njt4n/share/Data/Tumor/BRATS-1/Images/BRATS_HG0001_MASK.nii.gz
