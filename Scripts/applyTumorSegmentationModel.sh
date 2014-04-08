@@ -5,7 +5,7 @@ VERSION="0.0"
 ## need to change so that SCRIPTSPATH is where createFeatureImages.sh
 ## and the other scripts are located.
 
-SCRIPTSPATH=`dirname "$(readlink -f "$0")"`
+SCRIPTSPATH=`dirname $0`
 
 if [[ ! -d "$ANTSPATH" ]];
   then
