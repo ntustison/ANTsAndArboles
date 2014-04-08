@@ -482,10 +482,10 @@ for (( i = 0; i < ${#NORMALIZED_IMAGES[@]}; i++ ))
             COMMAND_LINE_LABELS=''
             for (( j = 1; j <= ${NUMBER_OF_LABELS}; j++ ))
               do
-                COMMAND_LINE_LABELS="${COMMAND_LINE_LABELS} -l $j"
+                COMMAND_LINE_LABELS="${COMMAND_LINE_LABELS} -y $j"
               done
 
-            bash ${ANTSPATH}/antsAtroposN4.sh \
+            logCmd ${ANTSPATH}/antsAtroposN4.sh \
               -d ${DIMENSION} \
               -b Socrates[0] \
               -a ${NORMALIZED_IMAGES[$i]} \
