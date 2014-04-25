@@ -518,12 +518,12 @@ and constructing the
 optimal multivariate template appearance 
 $\mathbf{J}=\{J_1,J_2,\ldots, J_K\}$ (with corresponding 
 coordinate system $\psi(\mathbf{x})$) to minimize the
-following cost function \textcolor{red}{not sure the 2nd term is correct...}:
+following cost function:
 \begin{align}
   \label{test}
   \sum_{n=1}^N \Bigg[ &D \left( \psi(\mathbf{x}),\phi_1^n(\mathbf{x},1)\right) \nonumber  \\
-           &+ \sum_{k=1}^K \lambda_k \Pi_k \left(I_k^n\left(\phi_n(\mathbf{x},0.5)\right),J_k   
-           \left(\phi^{-1}_n(\mathbf{x},0.5)\right)\right)\Bigg]
+           &+ \sum_{k=1}^K \lambda_k \Pi_k \left(I_k^n,J_k   
+           \left(\phi^{-1}_n(\mathbf{x},1)\right)\right)\Bigg]
 \end{align}
 %\begin{align}
 %  \sum_{n=1}^N 
