@@ -345,14 +345,14 @@ whereby the output probability images from the application of the first
 RF model seeds the construction of a subset of new feature images
 for input into the second stage.  The results of the second RF model
 are then refined using a series of heuristically-derived binary morphological
-operations.  \textcolor{red}{The two-stage approach is motivated by
+operations.  The two-stage approach is motivated by
 the fact that the RF is a powerful tool for ranking the features
 in a high-dimensional model i.e. can be used for model selection.
 However, the RF outputs are not geometrically constrained, which is
-the motivation for our second refinement step.}.
+the motivation for our second refinement step.
 
 In line with our philosophy regarding open science \citep{tustison2013,ince2012}, 
-we made the code available as open source%
+we have made the code available as open source%
 \footnote{
 https://github.com/ntustison/BRATS2013
 }
@@ -368,16 +368,16 @@ In subsequent sections we describe in greater detail the automated
 supervised brain segmentation pipeline including the generation of asymmetry
 feature images and the concatenated RF construction.  We also
 describe the code and data%
-\footnote{
-Although all data was provided having been skull-stripped, 
-we note to the reader that an
-available ANTs-based solution to the brain extraction problem
-is found in the script {\tt antsBrainExtraction.sh} which uses
-a hybrid approach based on image registration and binary morphology
-to isolate the brain \citep{avants2010a}.  An evaluation with other
-methodologies demonstrated comparable to superior performance 
-\citep{avants2010a}.
-} 
+%\footnote{
+%Although all data was provided having been skull-stripped, 
+%we note to the reader that an
+%available ANTs-based solution to the brain extraction problem
+%is found in the script {\tt antsBrainExtraction.sh} which uses
+%a hybrid approach based on image registration and binary morphology
+%to isolate the brain \citep{avants2010a}.  An evaluation with other
+%methodologies demonstrated comparable to superior performance 
+%\citep{avants2010a}.
+%} 
 used for the BRATS challenge so that 
 the interested reader can reproduce our results.  Finally, we 
 illustrate performance with results from the BRATS 2013 challenge.
@@ -391,7 +391,7 @@ illustrate performance with results from the BRATS 2013 challenge.
 
 \section{Materials and Methods}
 
-Certain key elements characterize the supervised brain tumor segmentation
+Certain key elements characterize the proposed supervised brain tumor segmentation
 protocol including:
 \begin{itemize}
   \item construction of symmetric multivariate templates for multimodal 
@@ -409,23 +409,7 @@ In subsequent sections, we describe these items and detail the
 
 \setlength{\tabcolsep}{2pt}
 
-\begin{figure}[h]
-  \centering
-  \begin{tabular}{cccc}
-  \includegraphics[width=30mm]{Figures/BRATS_HG0001/BRATS_HG0001_FLAIR_slice93.png} &
-  \includegraphics[width=30mm]{Figures/BRATS_HG0001/BRATS_HG0001_T1_slice93.png} &
-  \includegraphics[width=30mm]{Figures/BRATS_HG0001/BRATS_HG0001_T1C_slice93.png} &
-  \includegraphics[width=30mm]{Figures/BRATS_HG0001/BRATS_HG0001_T2_slice93.png} \\
-  (a) & (b) &
-  (c) & (d) \\
-  \end{tabular}
-  \caption{Induced bilateral asymmetry due to tumor presence causing
-  distortion of the plane of symmetry.  Shown are mid-axial slices of
-  one of the BRATS 2013 training data 
-  (specifically {\tt BRATS\_HG0001}):  (a) FLAIR, (b) T1, (c) T1C, and
-  (d) T2.  }
-  \label{fig:asymmetry}
-\end{figure}
+
 
 In order to better characterize deviations from normal brain shape 
 and appearance, several image features were derived using symmetric 
@@ -442,18 +426,42 @@ use the presence of asymmetries to potentially differentiate abnormal
 brain tissue.  A similar motivation prompted
 the identification of the mid-sagittal plane of symmetry \citep{prima2002}
 for feature generation in multiple sclerosis lesion \citep{geremia2011} and 
-tumor \citep{geremia2012} identification.  However, this
+tumor \citep{geremia2012} identification.  However, this earlier
 approach does not take into account the displacement of 
 normal tissue due to tumor growth causing the mid-sagittal plane
 to deform from its planar structure (cf Figure \ref{fig:asymmetry}).
 
+\begin{figure}
+  \centering
+  \begin{tabular}{cccc}
+  \includegraphics[width=30mm]{BRATS_HG0001/BRATS_HG0001_FLAIR_slice93.png} &
+  \includegraphics[width=30mm]{BRATS_HG0001/BRATS_HG0001_T1_slice93.png} &
+  \includegraphics[width=30mm]{BRATS_HG0001/BRATS_HG0001_T1C_slice93.png} &
+  \includegraphics[width=30mm]{BRATS_HG0001/BRATS_HG0001_T2_slice93.png} \\
+%  \includegraphics[width=20mm]{BRATS_HG0001/BRATS_HG0001_FLAIR_slice93.png} &
+%  \includegraphics[width=20mm]{BRATS_HG0001/BRATS_HG0001_T1_slice93.png} &
+%  \includegraphics[width=20mm]{BRATS_HG0001/BRATS_HG0001_T1C_slice93.png} &
+%  \includegraphics[width=20mm]{BRATS_HG0001/BRATS_HG0001_T2_slice93.png} \\
+  (a) & (b) &
+  (c) & (d) \\
+  \end{tabular}
+  \caption{Induced bilateral asymmetry due to tumor presence causing
+  distortion of the plane of symmetry.  Shown are mid-axial slices of
+  one of the BRATS 2013 training data 
+  (specifically {\tt BRATS\_HG0001}):  (a) FLAIR, (b) T1, (c) T1C, and
+  (d) T2.  }
+  \label{fig:asymmetry}
+\end{figure}
 
-\begin{figure}[h]
-    \centerline{\includegraphics[width=130mm]{Figures/templateKirby.pdf}}
+\begin{figure*}
+    \centerline{\includegraphics[width=130mm]{templateKirby.pdf}}
   \caption{Multivariate symmetric template created from the MMRR 
            data \citep{landman2011}.  Of the seven modalities 
            comprising the set of study acquisitions, we illustrate the
            (a) FA, (b) FLAIR, (c) MPRAGE, and (d) T2 template components.
+           Although DWI-based images were not included in the challenge data, 
+           such images have shown discriminative potential \citep{price2003,cha2005} 
+           warranting investigation in our future work.  
            The optimal transformation and averaging of the individual 
            subject images result in the asymmetric template represented at 
            the top of the middle column.  A horizontal reflection 
@@ -464,7 +472,7 @@ to deform from its planar structure (cf Figure \ref{fig:asymmetry}).
            the two asymmetric templates as input.
           }
   \label{fig:symmetrictemplates}
-\end{figure}
+\end{figure*}
 
 
 To take into account these potential asymmetries, we 
@@ -488,9 +496,10 @@ not currently included with the BRATS challenge into our
 segmentation framework).  
 
 
-\begin{figure}[!h]
+\begin{figure}
   \centering
-    \includegraphics[width=100mm]{Figures/asymmetryFeatureImages.pdf}
+%    \includegraphics[width=80mm]{asymmetryFeatureImages.pdf}
+    \includegraphics[width=120mm]{asymmetryFeatureImages.pdf}
   \caption{ Given the mapping between the template, $T$, and subject, $S$, domains ($\phi_b: S  \leftrightarrow \underset{b}{\leftrightsquigarrow} T$), various features can be calculated which demonstrate good discriminative qualities.  Feature images used are outlined in a dashed line.
 Top:  Difference images with the symmetric multivariate template are created by warping the template to the subject space and performing a voxelwise subtraction from the original modality image.
 Bottom:  Similarly, contralateral difference images are calculated from each modality per subject by generating the non-Euclidean contralateral image via the diffeomorphic transform $\phi_b$.  
@@ -507,13 +516,20 @@ template,
 $\left\{\left(\phi_1,\phi_1^{-1}\right),\ldots,\left(\phi_N,\phi_N^{-1}\right)\right\}$ 
 and constructing the 
 optimal multivariate template appearance 
-$\mathbf{J}=\{J_1,J_2,\ldots, J_K\}$ to minimize the
+$\mathbf{J}=\{J_1,J_2,\ldots, J_K\}$ (with corresponding 
+coordinate system $\psi(\mathbf{x})$) to minimize the
 following cost function \textcolor{red}{not sure the 2nd term is correct...}:
 \begin{align}
-  \sum_{n=1}^N 
-        \left[ D \left( \psi(\mathbf{x}),\phi_1^n(\mathbf{x},1)\right)  
-        + \sum_{k=1}^K \lambda_k \Pi_k \left(I_k^n\left(\phi_n(\mathbf{x},0.5)\right),J_k\left(\phi^{-1}_n(\mathbf{x},0.5)\right)\right)\right]
+  \label{test}
+  \sum_{n=1}^N \Bigg[ &D \left( \psi(\mathbf{x}),\phi_1^n(\mathbf{x},1)\right) \nonumber  \\
+           &+ \sum_{k=1}^K \lambda_k \Pi_k \left(I_k^n\left(\phi_n(\mathbf{x},0.5)\right),J_k   
+           \left(\phi^{-1}_n(\mathbf{x},0.5)\right)\right)\Bigg]
 \end{align}
+%\begin{align}
+%  \sum_{n=1}^N 
+%        \left[ D \left( \psi(\mathbf{x}),\phi_1^n(\mathbf{x},1)\right)   
+%        + \sum_{k=1}^K \lambda_k \Pi_k \left(I_k^n\left(\phi_n(\mathbf{x},0.5)\right),J_k\left(\phi^{-1}_n(\mathbf{x},0.5)\right)\right)\right]
+%\end{align}
 $D$ is the diffeomorphic shape distance,
 \begin{align}
 D\left( \phi( \mathbf{x},0),\phi( \mathbf{x},1)\right) = \int_0^1 \| \nu(\mathbf{x},t)\|_L dt
@@ -533,25 +549,25 @@ multivariate template construction a second time using only the multivariate
 template and its symmetric analog.  This is illustrated conceptually in
 Figure \ref{fig:symmetrictemplates}.
 
-In terms of implementation, this template building algorithm is 
-encapsulated in the script \verb#antsMultivariateTemplateConstruction.sh#,
-available in the ANTs repository, which permits serial or parallel processing on
-an individual workstation or on a computational cluster.  In
-Figure \ref{fig:symmetrictemplates} we show mid-axial slices from
-the MMRR multivariate symmetrical template consisting of FA%
-\footnote{
-Although DWI-based images were not included in the
-challenge data, such images have shown discriminative potential 
-\citep{price2003,cha2005} warranting investigation in our future
-work.  
-}, FLAIR,  
-T1, and T2 components.  These images have been made publicly available
-along with other processed images such as corresponding
-tissue priors and structural labels.%
-\footnote{
-http://figshare.com/articles/Kirby\_multivariate\_template/852989.
-All 7 components are stored under the more informal ``Kirby'' data set moniker.
-}
+%In terms of implementation, this template building algorithm is 
+%encapsulated in the script \verb#antsMultivariateTemplateConstruction.sh#,
+%available in the ANTs repository, which permits serial or parallel processing on
+%an individual workstation or on a computational cluster.  In
+%Figure \ref{fig:symmetrictemplates} we show mid-axial slices from
+%the MMRR multivariate symmetrical template consisting of FA%
+%\footnote{
+%Although DWI-based images were not included in the
+%challenge data, such images have shown discriminative potential 
+%\citep{price2003,cha2005} warranting investigation in our future
+%work.  
+%}, FLAIR,  
+%T1, and T2 components.  These images have been made publicly available
+%along with other processed images such as corresponding
+%tissue priors and structural labels.%
+%\footnote{
+%http://figshare.com/articles/Kirby\_multivariate\_template/852989.
+%All 7 components are stored under the more informal ``Kirby'' data set moniker.
+%}
 
 After constructing the template offline, each data set is processed
 by first registering the non-contrast T1-weighted image to the T1-weighted
@@ -588,12 +604,39 @@ relatively larger Jacobian values might be indicative of tumor
 expansion.
 
 
+\begin{figure*}
+\centering
+  \makebox[0.9\textwidth][c]{
+  \includegraphics[width=150mm]{featureImages.pdf}
+  }
+  \caption{Representative feature images derived from the 
+           BRATS\_HG0301  ``challenge'' data set.
+           Neighborhood statistical images for each modality were 
+           generated by calculating a given statistic within
+           a specified neighborhood radius.  Also calculated for each modality were feature
+           images based on either the GMM or the MAP-MRF segmentation.  For the former, we
+           show the probability maps for each of the seven labels which are used as feature
+           images.  From the resulting hard segmentation, we calculate various geometric 
+           measures per connected component of each of the seven labels.  Similarly, the 
+           registration to the symmetric template produces the modality-specific 
+           difference images with the
+           corresponding symmetric template itself and with respect to the 
+           contralateral side.   
+           This mapping is also used to produce the log Jacobian image.  Finally, the 
+           (T1 - TC) image is calculated and, from the
+           cerebral mask, we calculate the normalized distance image.  
+           }
+  \label{fig:featureImages}         
+\end{figure*}
+
+
 \subsubsection{Image Features for Concatenated Random Forests}
 
-\begin{figure}[!h]
+\begin{figure}
   \centering
   \begin{tabular}{c}
-    \includegraphics[width=100mm]{Figures/pipeline2.pdf}
+%    \includegraphics[width=88mm]{pipeline2.pdf}
+    \includegraphics[width=110mm]{pipeline2.pdf}
   \end{tabular}
   \caption{Diagrammatic workflow for the proposed RF model training and prediction.  The feature
   images are first generated from the input MRI and symmetric multivariate template. If training,
@@ -637,13 +680,30 @@ the output of which constitute the final tumor segmentation estimate.
 Note that some feature images are included in both stages such as
 the asymmetry features described in the previous section.
 
-\textcolor{red}{Nick, I think the motivation for this is still unclear
-  .... doesnt it have something to do with the MRF of atropos
-  smoothing out the importance features resulting from the RF step?
-  Figure 4 tells us a little bit about the procedure of the code but
-  the idea is not conveyed ... would it be possible to show exactly
-  what is happening in a separate figure?  e.g. just conceptually in a small 
-  region of voxels with 2 modalities ....?}
+\begin{figure}
+  \centering
+  \begin{tabular}{c}
+    \includegraphics[width=88mm]{gmm_map_mrf.pdf}
+  \end{tabular}
+  \caption{Visual comparison between the first and second RF stages
+  on the evaluation {\tt BRATS\_HG0001} data set.
+  Although the GMM intensity modeling does provide certain 
+  discriminative benefit (see Figures \ref{fig:hgimportance}
+  and \ref{fig:lgimportance}), the use of the RF-derived posteriors 
+  coupled with the described MAP-MRF segmentation framework enhances 
+  the accuracy of the intensity-based modeling features.    
+  }
+  \label{fig:stageComparison}
+\end{figure}
+
+
+%\textcolor{red}{Nick, I think the motivation for this is still unclear
+%  .... doesnt it have something to do with the MRF of atropos
+%  smoothing out the importance features resulting from the RF step?
+%  Figure 4 tells us a little bit about the procedure of the code but
+%  the idea is not conveyed ... would it be possible to show exactly
+%  what is happening in a separate figure?  e.g. just conceptually in a small 
+%  region of voxels with 2 modalities ....?}
 
 For both stages, in contrast to previous generative
 modeling approaches for multimodal tumor segmentation 
@@ -656,12 +716,11 @@ modality.  Instead, we let the RF construction
 process determine the optimal combination of such multivariate
 information.  Additionally, maximum posterior labeling from both stages
 is used to determine the connected components for each label.  
-Geometric features (assigned voxel-wise) include the physical volumes 
+Geometric features (assigned voxelwise) include the physical volumes 
 of each connected component, the volume to surface area ratio, 
 the elongation, and eccentricity. 
 
-
-\paragraph{Stage 1 (GMM)} \textcolor{red}{more descriptive name}
+\paragraph{Stage 1 (Initial voxelwise classification)} 
 Gaussian mixture modeling (GMM) is used to assign voxelwise
 tissue probabilities which comprise an additional set of image features 
 where 
@@ -706,30 +765,19 @@ given in the standard \textit{R} notation of \cite{wilkinson1973}.  The
 set of $\left\{F_i: i \in Asym\right\}$ are the feature images 
 generated from the symmetric multivariate template 
 described in the previous section and $\left\{F_i: i \in Misc\right\}$
-are miscellaneous  feature images described in Section \ref{sec:misc}.
+are miscellaneous feature images described in Section \ref{sec:misc}.
 
+\paragraph{Stage 2 (Refined spatial coherence classification)}
 
-\textcolor{red}{still feel unclear about it ...  does it go like this?
-\begin{enumerate}
-\item use tissue prior intensity models (not spatial) to initialize
-  Atropos multivariate EM-MRF segmentation of new image  w/o spatial
-  priors 
-\item get out segmentation and posteriors ... run some shape stats on
-  the segmentation 
-\item separately compute the asymmetry features by mapping to the MV
-  template 
-\item input  asymmFeatures + atroposPosteriors + shapeFeatures to the
-  RF model  ... with or w/o ground truth outcomes ?  same either way?
-  what do you get out of the RF?
-\end{enumerate}
-}
-
-\paragraph{Stage 2 (MAP-MRF)}
-
-Application of the Stage 1 RF model results in a set of
-probabilistic estimates for each of the seven tissue types.  
-\textcolor{red}{can you say more here --- what are these in RF and R
-  terms?  how the RF generate probabilities ?}
+Application of the Stage 1 RF model to a set of feature images 
+from an individual subjects results in a set of
+images estimating the spatial probabilities for each 
+of the seven tissue types. At each voxel, the corresponding multi-feature 
+vector is propagated through each tree of the random forest 
+resulting in a single vote/classification per tree.  The
+classification probabilities are derived by normalizing 
+these votes to $[0,1]$.
+ 
 At the beginning of the second stage, these spatial probability maps are 
 used as spatial priors in a 
 MAP-MRF segmentation also performed using the Atropos 
@@ -745,13 +793,16 @@ The second stage RF model is then produced similarly as the previous stage:
 \label{eq:mapmrf}
 \mathrm{Tissue}\,\,\mathrm{classes} \sim \sum_{i \in MAP-MRF} F_i + \sum_{i \in Asym} F_i + \sum_{i \in Misc} F_i.
 \end{align}
-We discovered that this composite application of random
-forest models improves the resulting labeled output.
-\textcolor{red}{Is this so much a discovery or is it that the MRF
-  features ``fix'' the RF output by introducing spatial coherence to
-  the results .... at least , that's what it seems to me that you are
-  doing ...}
+The use of these MRF features improves the accuracy of the 
+intensity-based modeling over the GMM approach by introducing
+a spatial coherence constraint to those features in addition to 
+providing a better initialization with the RF posteriors from 
+the initial estimation stage.
 
+%\textcolor{red}{Is this so much a discovery or is it that the MRF
+%  features ``fix'' the RF output by introducing spatial coherence to
+%  the results .... at least , that's what it seems to me that you are
+%  doing ...}
 
 \subsubsection{Miscellaneous Multimodal Feature Image Generation}
 \label{sec:misc}
@@ -773,37 +824,49 @@ The script {\tt createFeatureImages.sh} performs all preprocessing
 and generates all feature images.  In Figure \ref{fig:featureImages} we provide sample mid-axial 
 image slices from features generated from the {\tt BRATS\_HG0301} data set.
 
-\begin{figure*}[h]
-%  \centering
-%  \makebox[0.9\textwidth][c]{
-  \includegraphics[width=150mm]{Figures/featureImages.pdf}
-%  }
-  \caption{Representative feature images derived from the 
-           BRATS\_HG0301  ``challenge'' data set.
-           Neighborhood statistical images for each modality were 
-           generated by calculating a given statistic within
-           a specified neighborhood radius.  Also calculated for each modality were feature
-           images based on either the GMM or the MAP-MRF segmentation.  For the former, we
-           show the probability maps for each of the seven labels which are used as feature
-           images.  From the resulting hard segmentation, we calculate various geometric 
-           measures per connected component of each of the seven labels.  Similarly, the 
-           registration to the symmetric template produces the modality-specific 
-           difference images with the
-           corresponding symmetric template itself and with respect to the 
-           contralateral side.   
-           This mapping is also used to produce the log Jacobian image.  Finally, the 
-           (T1 - TC) image is calculated and, from the
-           cerebral mask, we calculate the normalized distance image.  
-           }
-  \label{fig:featureImages}         
-\end{figure*}
+\subsection{Overview}
+
+In summary, the proposed RF classification approach per subject consists of the 
+following steps:
+
+\begin{enumerate}
+  \item Calculate stage 1 features based on:  
+  \begin{itemize}
+    \item GMM intensity modeling,
+    \item asymmetry, and
+    \item miscellaneous.
+  \end{itemize}
+  \item Apply stage 1 RF model to the above calculated features resulting in seven 
+        probability maps for the seven tissue types.  
+  \item Use the probability maps to calculate stage 2 features based on MAP-MRF intensity modeling.
+  \item Apply stage 2 RF model to MAP-MRF, asymmetry, and miscellaneous features to 
+  get final RF classification. 
+\end{enumerate}
+
+%\textcolor{red}{still feel unclear about it ...  does it go like this?
+%\begin{enumerate}
+%\item use tissue prior intensity models (not spatial) to initialize
+%  Atropos multivariate EM-MRF segmentation of new image  w/o spatial
+%  priors 
+%\item get out segmentation and posteriors ... run some shape stats on
+%  the segmentation 
+%\item separately compute the asymmetry features by mapping to the MV
+%  template 
+%\item input  asymmFeatures + atroposPosteriors + shapeFeatures to the
+%  RF model  ... with or w/o ground truth outcomes ?  same either way?
+%  what do you get out of the RF?
+%\end{enumerate}
+%}
+
+
+
+
+
+
+
 
 
 \subsection{\textit{ANTsR}:  An ANTs/R Interface}
-We briefly describe our imaging-specific interface between
-\textit{ANTs} and \textit{R}.
-
-\subsubsection{Overview}
 
 The complexity of neuroimaging research necessitates 
 commensurable numerical analysis capabilities.  Similarly, concomitant
@@ -1076,9 +1139,11 @@ http://www.uvacse.edu
 \section{Results}
 
 
-\begin{figure}[!htb]
-  \centering
-  \includegraphics[width=120mm]{Figures/challengeResults.pdf}
+\begin{figure*}
+  \vspace{-20mm}
+  \makebox[\textwidth][c]{
+  \includegraphics[width=140mm]{challengeResults.pdf}
+  }
   \caption{Visual results (every tenth slice sampled from the axial center of the
   tumor region) from the BRATS 2013 challenge using the proposed
   framework (off-white = non-enhancing tumor, cyan = edema, violet = enhancing 
@@ -1089,7 +1154,7 @@ http://www.uvacse.edu
   and challenge rankings.
   }
   \label{fig:challengeresults}
-\end{figure}
+\end{figure*}
 
 
 
@@ -1154,14 +1219,13 @@ whereas the low-grade plots are given in Figure \ref{fig:lgimportance}.
 \begin{figure*}
   \makebox[\textwidth][c]{
   \begin{tabular}{cc}
-  \includegraphics[width=90mm]{Figures/BRATS_HG_GMM.pdf} &
-  \includegraphics[width=90mm]{Figures/BRATS_HG_MAP_MRF.pdf} \\
+  \includegraphics[width=90mm]{BRATS_HG_GMM.pdf} &
+  \includegraphics[width=90mm]{BRATS_HG_MAP_MRF.pdf} \\
   \end{tabular}
   }
   \caption{{\tt MeanDecreaseAccuracy} plots generated from the high-grade glioma
   Stage 1 and Stage 2 RF models.  These plots provide a weighted 
   ranking describing the importance of each feature for predictive accuracy. 
-  Features are listed from most to least important.
   }
   \label{fig:hgimportance}
 \end{figure*}
@@ -1169,14 +1233,13 @@ whereas the low-grade plots are given in Figure \ref{fig:lgimportance}.
 \begin{figure*}
   \makebox[\textwidth][c]{
   \begin{tabular}{cc}
-  \includegraphics[width=90mm]{Figures/BRATS_LG_GMM.pdf} &
-  \includegraphics[width=90mm]{Figures/BRATS_LG_MAP_MRF.pdf} \\
+  \includegraphics[width=90mm]{BRATS_LG_GMM.pdf} &
+  \includegraphics[width=90mm]{BRATS_LG_MAP_MRF.pdf} \\
   \end{tabular}
   }
   \caption{{\tt MeanDecreaseAccuracy} plots generated from the low-grade glioma
   Stage 1 and Stage 2 RF models.  These plots provide a weighted 
   ranking describing the importance of each feature for predictive accuracy.
-  Features are listed from most to least important.
   }
   \label{fig:lgimportance}
 \end{figure*}
@@ -1259,7 +1322,7 @@ package with \textit{R} provides tremendous potential for future insightful anal
 %% References with bibTeX database:
 
 %\section*{Acknowledgments}
-\clearpage
+%\clearpage
 \section*{References}
 
 \bibliographystyle{elsarticle-harv}
