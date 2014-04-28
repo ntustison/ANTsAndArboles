@@ -367,7 +367,10 @@ package.
 In subsequent sections we describe in greater detail the automated 
 supervised brain segmentation pipeline including the generation of asymmetry
 feature images and the concatenated RF construction.  We also
-describe the code and data%
+describe the code and data used for the BRATS challenge so that 
+the interested reader can reproduce our results.  Finally, we 
+illustrate performance with results from the BRATS 2013 challenge.
+ 
 %\footnote{
 %Although all data was provided having been skull-stripped, 
 %we note to the reader that an
@@ -378,9 +381,6 @@ describe the code and data%
 %methodologies demonstrated comparable to superior performance 
 %\citep{avants2010a}.
 %} 
-used for the BRATS challenge so that 
-the interested reader can reproduce our results.  Finally, we 
-illustrate performance with results from the BRATS 2013 challenge.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -656,13 +656,14 @@ of two RF models in succession
 (see Figure \ref{fig:pipeline}) to which we refer as ``stages.''  The basic idea is that
 we generate a set of feature images used as input to the
 first RF model (or first stage) which produces a voxelwise 
-probabilistic tissue estimate%
-\footnote{
-More precisely, in the RF framework, each prediction sample (i.e. the feature vector at each voxel),
+probabilistic tissue estimate.  More precisely, in the RF framework, each prediction sample (i.e. the feature vector at each voxel),
 is propagated through each tree of the ensemble where it is labeled as belonging to a specific
-class.  These ``votes'' are converted to voxelwise probabilistic estimates for each class.
-}
- for the seven brain/tumor tissue types:
+class.  These ``votes'' are converted to voxelwise probabilistic
+estimates for each class.
+\textcolor{red}{FIXME --- above comments need more detail ... how/why
+  is this a probability, what does this mean?   it's bootstrapping etc
+right so what can we say about this?}
+The seven brain/tumor tissue types include:
 \begin{itemize}
 \item cerebrospinal fluid,
 \item grey matter,
