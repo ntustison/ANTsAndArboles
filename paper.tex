@@ -38,7 +38,7 @@
 %% \documentclass[final,5p,times,twocolumn]{elsarticle}
 
 
-\usepackage{color,hyperref}
+\usepackage{color,hyperref,bm}
 \usepackage{multirow,booktabs,ctable,array}
 \usepackage{lscape}
 \usepackage{amsmath}
@@ -397,13 +397,17 @@ protocol including:
   \item construction of symmetric multivariate templates for multimodal 
         asymmetry-based features,
   \item generation of other image-based features,
-  \item training of RF models, and
+  \item training and geometric refinement of RF models, and
   \item prediction using the proposed framework.
 \end{itemize}
 In subsequent sections, we describe these items and detail the
 \textit{ANTsR} framework which coordinates all steps.
 
 \subsection{Image Features for RF Model Training and Prediction}
+Feature generation is a critical step in machine learning regardless
+of which prediction methods are employed.  Below, we detail the
+feature extraction approach and how these results are fed into the
+random forest technology on which we based our final segmentations.
 
 \subsubsection{Multimodal Asymmetry Features from Multivariate Symmetric Templates}
 
@@ -645,12 +649,24 @@ expansion.
   a second set of feature images to create the second stage RF model (if training) and/or generate
   the second RF model.  
   For prediction, the final refinement process entails a series of heuristically-derived
-  binary morphological resulting in the final labeled brain.  
+  binary morphological resulting in the final labeled brain.
+  \textcolor{red}{I still find this unclear, especially the arrows
+    that cross between training and testing --- intuitively, this
+    seems impossible w/o circularity.}
   }
   \label{fig:pipeline}
 \end{figure}
 
-
+We use random forests as supervised learners.  Given ground truth,
+voxel-wise $n$-class labels for a specific image, we can vectorize the
+label image to produce $v_L$, the $p$-length vector of class labels
+where $p$ is the number of voxels in the given brain of interest.
+We also assume a matrix of features for the given brain, which we
+denote $\bm{F}$ where $\bm{F}$ has dimensionality of $p$ by
+$k$, where each of the $k$ columns corresponds a potentially valuable
+feature vector.  Given this representation, the random forest model
+can be trained, in \textit{R} notation, to predict the labels via
+$v_L \sim  \bm{F}$.
 Our segmentation protocol involves training and application
 of two RF models in succession 
 (see Figure \ref{fig:pipeline}) to which we refer as ``stages.''  The basic idea is that
@@ -658,12 +674,11 @@ we generate a set of feature images used as input to the
 first RF model (or first stage) which produces a voxelwise 
 probabilistic tissue estimate.  More precisely, in the RF framework, each prediction sample (i.e. the feature vector at each voxel),
 is propagated through each tree of the ensemble where it is labeled as belonging to a specific
-class.  These ``votes'' are converted to voxelwise probabilistic
-estimates for each class.
-\textcolor{red}{FIXME --- above comments need more detail ... how/why
-  is this a probability, what does this mean?   it's bootstrapping etc
-right so what can we say about this?}
-The seven brain/tumor tissue types include:
+class.  
+These ``votes'' are converted to voxelwise probabilistic
+estimates for each class via standard mechanisms used in random forest
+models, e.g. \cite{liaw2002}.
+The seven labels of brain/tumor tissue type denote:
 \begin{itemize}
 \item cerebrospinal fluid,
 \item grey matter,
@@ -674,11 +689,12 @@ The seven brain/tumor tissue types include:
 \item abnormal necrotic center or necrocyst in high-grade gliomas.
 \end{itemize}
 We then use these output tissue map estimates as spatial 
-priors for generating a second set of image features.  These
+priors for generating a second set of geometrically refined image features.  These
 are used as input for a second RF model application (or
 second stage),
 the output of which constitute the final tumor segmentation estimate.
-Note that some feature images are included in both stages such as
+Note that some feature images are included \textbf{directly and
+  without modification(?)} in both stages such as
 the asymmetry features described in the previous section.
 
 \begin{figure}
@@ -711,7 +727,7 @@ modeling approaches for multimodal tumor segmentation
 \citep[e.g.,][]{prastawa2003}, we do not use multivariate 
 Gaussians to specify tissue probabilities but rather incorporate each
 univariate probability map into the feature vector of the training
-data.  As pointed out in \cite{menze2010}, multivariate modeling
+data.  As pointed out in \cite{menze2010}, parametric multivariate modeling
 might obscure the distinct biological information provided by each 
 modality.  Instead, we let the RF construction 
 process determine the optimal combination of such multivariate
@@ -719,38 +735,45 @@ information.  Additionally, maximum posterior labeling from both stages
 is used to determine the connected components for each label.  
 Geometric features (assigned voxelwise) include the physical volumes 
 of each connected component, the volume to surface area ratio, 
-the elongation, and eccentricity. 
+the elongation, and eccentricity.  Note that random forests are
+known to be robust to the presence of multiple correlated features.
 
-\paragraph{Stage 1 (Initial voxelwise classification)} 
-Gaussian mixture modeling (GMM) is used to assign voxelwise
-tissue probabilities which comprise an additional set of image features 
-where 
-prior cluster centers for specific tissue types for each
-modality are learned from training data \citep{reynolds2009}.  
-Intensity normalization
-across the training cohort was originally performed using 
-\cite{nyul2000}.  However, despite good performance on normal
-data, application of this intensity normalization algorithm 
-(after a thorough parameter search) on BRATS data led to slightly 
-worse performance than simply winsorizing the intensity values to the quantile
+\paragraph{Stage 1 voxelwise classification with Gaussian mixture
+  modeling} 
+The first step in processing a new image is to segment the image into
+the $n$ tissue classes listed above.   We achieve this via an expectation-maximization
+segmentation method based on
+Gaussian mixture modeling (GMM).  GMM results in voxelwise
+tissue probabilities which comprise an additional set of image
+features.  The GMM is initialized with prior cluster centers for
+specific tissue types.  We learn the values for these cluster centers
+for each modality and each tissue from training data
+\citep{reynolds2009}.  We also perform intensity normalization
+across the training cohort by winsorizing the intensity values to the quantile
 range $[0.01, 0.99]$ and then rescaling the resulting intensities to 
-$[0,1]$ so we opted for the latter, more simplistic intensity
-normalization protocol.  The cluster centers are defined as the mean
+$[0,1]$.  The cluster centers are defined as the mean
 normalized intensity value for each tissue type of each modality 
 image over all the training data.  It should be noted that 
 initializing with these values is optional and that results
-seem to be robust to initialization values.
+seem to be robust to initialization values.  \textcolor{red}{How else
+  would you initialize? how robust?  how did you test this?}
 
-A GMM formulates the 
+More formally, the GMM computes the 
 probability distribution at each voxel, $\mathbf{x}$, as the
 sum of $M$ Gaussian components, $\mathcal{N}(\mathbf{x}|\mu,\sigma)$, i.e.
 \begin{align}
 p\left(\mathbf{x}|\mu_m,\sigma_m,\lambda_m\right) = \sum_{i=1}^M \lambda_m \mathcal{N}(\mathbf{x}|\mu_m,\sigma_m)
 \end{align}
 where $\sum_{m=1}^M \lambda_m = 1$.  The parameters of the GMM 
-are determined with maximum likelihood estimation using the 
-Atropos segmentation tool \citep{avants2011} available in ANTs.  
-We include the resulting seven posterior probability tissue images 
+are determined using the 
+Atropos segmentation tool \citep{avants2011} available in ANTs.
+\textcolor{red}{What modalities are input to Atropos?  Should we
+  reference a figure here to make this clear?  Would listing a table of the
+  prior per-class per-modality tissue cluster centers be helpful?}
+
+\paragraph{Stage 1 random forest} 
+The stage 1 random forest training uses the asymmetry features, the seven posterior probability
+tissue images output by the GMM
 along with five additional geometric features based on the connected 
 components of the segmentation image (distance image to tumor core,
 physical volume image, volume to surface area ratio, eccentricity,
@@ -760,62 +783,69 @@ these feature images, $\left\{F_i: i \in GMM\right\}$, generated during Stage 1 
 the Stage 1 RF model using the following relationship
 \begin{align}
 \label{eq:gmm}
-\mathrm{Tissue}\,\,\mathrm{classes} \sim \sum_{i \in GMM} F_i + \sum_{i \in Asym} F_i + \sum_{i \in Misc} F_i
+ v_L \sim \sum_{i \in Asym} F_i + \sum_{i \in GMM} F_i + \sum_{i \in Misc} F_i
 \end{align}
-given in the standard \textit{R} notation of \cite{wilkinson1973}.  The
-set of $\left\{F_i: i \in Asym\right\}$ are the feature images 
+given in the standard \textit{R} notation of \cite{wilkinson1973}.  
+In other words, $\bm{F}= [ \bm{F}_{Asym}, \bm{F}_{GMM},
+\bm{F}_{Misc} ]$, where we column-wise concatenate the GMM, Asym and
+Misc feature matrices.
+The set of $\left\{F_i: i \in Asym\right\}$ are the feature images 
 generated from the symmetric multivariate template 
 described in the previous section and $\left\{F_i: i \in Misc\right\}$
 are miscellaneous feature images described in Section \ref{sec:misc}.
+Therefore, in total, the number of features is $k=FIXME$ where there
+are 7 GMM features, FIXME asymmetry features and FIXME miscellaneous
+geometric features.
 
 \paragraph{Stage 2 (Refined spatial coherence classification)}
-
-Application of the Stage 1 RF model to a set of feature images 
-from an individual subjects results in a set of
-images estimating the spatial probabilities for each 
-of the seven tissue types. At each voxel, the corresponding multi-feature 
+The first step in stage 2 is to use the per-class probabilities output
+by the stage 1 random forest model as input to the Atropos
+segmentation algorithm.  Application of the Stage 1 RF model to a set of feature images 
+from an individual subject results in a set of $n$ spatial images
+containing the voxel-wise probabilities for each 
+of the seven tissue types.  At each voxel, the corresponding multi-feature 
 vector is propagated through each tree of the random forest 
 resulting in a single vote/classification per tree.  The
 classification probabilities are derived by normalizing 
-these votes to $[0,1]$.
+these votes to $[0,1]$ as in \cite{liaw2002}.
  
-At the beginning of the second stage, these spatial probability maps are 
-used as spatial priors in a 
-MAP-MRF segmentation also performed using the Atropos 
-segmentation tool \citep{avants2011} available in ANTs although we couple
-it with N4 bias correction \citep{tustison2010} as contained in the script
-{\tt antsAtroposN4.sh}.  The probabilistic segmentation output and corresponding
-connected-component feature images for each modality replace the analogous 
-GMM-based feature images used 
-during the first stage of training/prediction along with the other feature
-images generated during the feature stage (such as the template-based data).
+These spatial probability maps are passed as spatial priors to the
+{\tt antsAtroposN4.sh} script in ANTs which couples the Atropos 
+segmentation tool \citep{avants2011} with N4 bias correction \citep{tustison2010}.
+The posterior probabilities that are output by Atropos and the
+connected-component feature images for each modality (described in
+section~\ref{sec:misc}) are then passed to the second stage random
+forest model, along with the same asymmetry feature set based on our
+symmetric templates.  
 The second stage RF model is then produced similarly as the previous stage: 
 \begin{align}
 \label{eq:mapmrf}
-\mathrm{Tissue}\,\,\mathrm{classes} \sim \sum_{i \in MAP-MRF} F_i + \sum_{i \in Asym} F_i + \sum_{i \in Misc} F_i.
+\mathrm{Tissue}\,\,\mathrm{classes} \sim \sum_{i \in GMM_2} F_i + \sum_{i \in Asym} F_i + \sum_{i \in Misc} F_i,
 \end{align}
+where $GMM_2$ represents the stage 2 application of Atropos and the
+other features are similar to those used in stage 1.
 The use of these MRF features improves the accuracy of the 
 intensity-based modeling over the GMM approach by introducing
 a spatial coherence constraint to those features in addition to 
 providing a better initialization with the RF posteriors from 
-the initial estimation stage.
+the initial estimation stage.  \textcolor{red}{This last sentence
+  confuses me --- what is the difference between the GMM and MRF
+  features?  I made a notation change $GMM_2$, b.c i thought the MRF
+  and GMM were the same ... but maybe not?  did you exclude the MRF
+  prior in the first application of Atropos?}
 
-%\textcolor{red}{Is this so much a discovery or is it that the MRF
-%  features ``fix'' the RF output by introducing spatial coherence to
-%  the results .... at least , that's what it seems to me that you are
-%  doing ...}
 
 \subsubsection{Miscellaneous Multimodal Feature Image Generation}
 \label{sec:misc}
 Our strategy for feature selection was to, first, generate an ample feature
 set and, second, to use the training phase to prioritize the features
 appropriately.  In principal, this will eliminate weak features and
-retain strong ones even in the presence of substantial noise (cite
-some RF paper here ...).  For each modality, several images
-were generated based on calculation of voxelwise neighborhood 
-first-order statistics including mean, variance, skewness, and entropy
-using neighborhood block radii
-of 1 and 3 voxels.  We also calculated two Euclidean distance
+retain strong ones even in the presence of substantial noise.  Given
+that image feature shape may be a valuable predictor of the presence of a
+tumor \cite{zacharaki2009classification}, we calculate, for each modality, several images of neighborhood 
+first-order statistics including mean, variance, skewness, and
+entropy.  Neighborhoods are defined by block radii
+of 1 and 3 voxels \textcolor{red}{Why these values?}.  We also calculated two Euclidean distance
 transforms \citep{maurer2003} to be used for each subject.  One was
 calculated from the subject's own cerebral mask and the other was the 
 distance transform of the symmetric template cerebral mask warped
@@ -823,7 +853,9 @@ to the subject.  Finally, we also generated the  (T1 - T1C) difference
 image \citep{prastawa2003}.
 The script {\tt createFeatureImages.sh} performs all preprocessing
 and generates all feature images.  In Figure \ref{fig:featureImages} we provide sample mid-axial 
-image slices from features generated from the {\tt BRATS\_HG0301} data set.
+image slices from features generated from the {\tt BRATS\_HG0301} data
+set.  Note that these feature images do not require the presence of
+any training data.
 
 \subsection{Overview}
 
