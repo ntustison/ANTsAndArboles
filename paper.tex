@@ -638,21 +638,21 @@ expansion.
 
 \begin{figure}
   \centering
-  \begin{tabular}{c}
-%    \includegraphics[width=88mm]{pipeline2.pdf}
-    \includegraphics[width=110mm]{pipeline2.pdf}
-  \end{tabular}
-  \caption{Diagrammatic workflow for the proposed RF model training and prediction.  The feature
-  images are first generated from the input MRI and symmetric multivariate template. If training,
-  the set of feature images derived from the training data are used to create the RF model
-  for the first stage.  The model is then applied to the training or prediction data to generate 
-  a second set of feature images to create the second stage RF model (if training) and/or generate
-  the second RF model.  
-  For prediction, the final refinement process entails a series of heuristically-derived
-  binary morphological resulting in the final labeled brain.
-  \textcolor{red}{I still find this unclear, especially the arrows
-    that cross between training and testing --- intuitively, this
-    seems impossible w/o circularity.}
+   \vspace{-15mm}
+  \makebox[0.9\textwidth][c]{
+    \includegraphics[width=150mm]{pipelineTestingTraining.pdf}
+    }
+  \caption{Diagrammatic workflow for the proposed RF model training (left) and prediction
+  (right).  For training, the feature images are first generated from the set of input 
+  training multimodal MRI and symmetric multivariate template. The set of features images are 
+  use to create the RF model for the first stage.  This first stage RF model is then applied
+  to the set of input training data to yield spatial priors for seeding the generation of the
+  second stage feature images.  These feature images are then used to create the second
+  stage RF model.  For prediction of a single-subject segmentation, a similar scenario 
+  is applied whereby the generated feature images are used as input to the RF models the
+  second of which produces an initial segmentation estimate.  This estimate is then refined
+  using a series of heuristically-derived binary morphological operations resulting in the 
+  final labeled brain.
   }
   \label{fig:pipeline}
 \end{figure}
@@ -693,8 +693,8 @@ priors for generating a second set of geometrically refined image features.  The
 are used as input for a second RF model application (or
 second stage),
 the output of which constitute the final tumor segmentation estimate.
-Note that some feature images are included \textbf{directly and
-  without modification(?)} in both stages such as
+Note that some feature images are included directly and
+  without modification in both stages such as
 the asymmetry features described in the previous section.
 
 \begin{figure}
@@ -738,7 +738,7 @@ of each connected component, the volume to surface area ratio,
 the elongation, and eccentricity.  Note that random forests are
 known to be robust to the presence of multiple correlated features.
 
-\paragraph{Stage 1 voxelwise classification with Gaussian mixture
+\paragraph{Stage 1:  Voxelwise classification with Gaussian mixture
   modeling} 
 The first step in processing a new image is to segment the image into
 the $n$ tissue classes listed above.   We achieve this via an expectation-maximization
@@ -751,12 +751,12 @@ for each modality and each tissue from training data
 \citep{reynolds2009}.  We also perform intensity normalization
 across the training cohort by winsorizing the intensity values to the quantile
 range $[0.01, 0.99]$ and then rescaling the resulting intensities to 
-$[0,1]$.  The cluster centers are defined as the mean
+$[0, 1]$.  The cluster centers are defined as the mean
 normalized intensity value for each tissue type of each modality 
-image over all the training data.  It should be noted that 
-initializing with these values is optional and that results
-seem to be robust to initialization values.  \textcolor{red}{How else
-  would you initialize? how robust?  how did you test this?}
+image over all the training data.  We tried a more sophisticated intensity
+normalization scheme using the approach of \cite{nyul2000} but found that
+our simpler normalization approach, in combination with the rest of the
+pipeline, produced slightly better results.  
 
 More formally, the GMM computes the 
 probability distribution at each voxel, $\mathbf{x}$, as the
@@ -765,13 +765,12 @@ sum of $M$ Gaussian components, $\mathcal{N}(\mathbf{x}|\mu,\sigma)$, i.e.
 p\left(\mathbf{x}|\mu_m,\sigma_m,\lambda_m\right) = \sum_{i=1}^M \lambda_m \mathcal{N}(\mathbf{x}|\mu_m,\sigma_m)
 \end{align}
 where $\sum_{m=1}^M \lambda_m = 1$.  The parameters of the GMM 
-are determined using the 
-Atropos segmentation tool \citep{avants2011} available in ANTs.
-\textcolor{red}{What modalities are input to Atropos?  Should we
-  reference a figure here to make this clear?  Would listing a table of the
-  prior per-class per-modality tissue cluster centers be helpful?}
+are determined using the Atropos segmentation tool \citep{avants2011} available in ANTs.
+For the BRATS data, GMM modeling was applied to each of the four modalities, i.e.,
+FLAIR, T1, T1 contrast, and T2 (see Figure \ref{fig:stageComparison}), separately.  
+Note that no spatial priors are used during this stage including MRF spatial priors.
 
-\paragraph{Stage 1 random forest} 
+%\paragraph{Stage 1 random forest} 
 The stage 1 random forest training uses the asymmetry features, the seven posterior probability
 tissue images output by the GMM
 along with five additional geometric features based on the connected 
@@ -793,11 +792,15 @@ The set of $\left\{F_i: i \in Asym\right\}$ are the feature images
 generated from the symmetric multivariate template 
 described in the previous section and $\left\{F_i: i \in Misc\right\}$
 are miscellaneous feature images described in Section \ref{sec:misc}.
-Therefore, in total, the number of features is $k=FIXME$ where there
-are 7 GMM features, FIXME asymmetry features and FIXME miscellaneous
-geometric features.
+Therefore, in total, the number of features is $k=84$ where there
+are twelve GMM features for each of the four modalities ($n=48$), 
+two asymmetry features for each modality ($n=8$), and six modality-specific 
+miscellaneous geometric features ($n=24$) with an additional four feature
+images.
 
-\paragraph{Stage 2 (Refined spatial coherence classification)}
+% 48 + 8 + 24 + 4 = 84
+
+\paragraph{Stage 2:  Refined spatial coherence classification}
 The first step in stage 2 is to use the per-class probabilities output
 by the stage 1 random forest model as input to the Atropos
 segmentation algorithm.  Application of the Stage 1 RF model to a set of feature images 
@@ -820,19 +823,17 @@ symmetric templates.
 The second stage RF model is then produced similarly as the previous stage: 
 \begin{align}
 \label{eq:mapmrf}
-\mathrm{Tissue}\,\,\mathrm{classes} \sim \sum_{i \in GMM_2} F_i + \sum_{i \in Asym} F_i + \sum_{i \in Misc} F_i,
+\mathrm{Tissue}\,\,\mathrm{classes} \sim \sum_{i \in MAP\_MRF} F_i + \sum_{i \in Asym} F_i + \sum_{i \in Misc} F_i,
 \end{align}
-where $GMM_2$ represents the stage 2 application of Atropos and the
-other features are similar to those used in stage 1.
+where $MAP-MRF$ represents the Stage 2 application of Atropos and the
+other features are similar to those used in Stage 1.
 The use of these MRF features improves the accuracy of the 
 intensity-based modeling over the GMM approach by introducing
-a spatial coherence constraint to those features in addition to 
+a spatial coherence constraint (the MRF prior) to those features 
+in addition to 
 providing a better initialization with the RF posteriors from 
-the initial estimation stage.  \textcolor{red}{This last sentence
-  confuses me --- what is the difference between the GMM and MRF
-  features?  I made a notation change $GMM_2$, b.c i thought the MRF
-  and GMM were the same ... but maybe not?  did you exclude the MRF
-  prior in the first application of Atropos?}
+the initial estimation stage (which lacked the MRF spatial prior).  
+
 
 
 \subsubsection{Miscellaneous Multimodal Feature Image Generation}
@@ -844,8 +845,9 @@ retain strong ones even in the presence of substantial noise.  Given
 that image feature shape may be a valuable predictor of the presence of a
 tumor \cite{zacharaki2009classification}, we calculate, for each modality, several images of neighborhood 
 first-order statistics including mean, variance, skewness, and
-entropy.  Neighborhoods are defined by block radii
-of 1 and 3 voxels \textcolor{red}{Why these values?}.  We also calculated two Euclidean distance
+entropy.  Block neighborhood radii of values $\{1,2,3\}$ were tested.
+Due to overlapping discriminative qualities, we narrowed the feature
+values to 1 and 3 voxels.  We also calculated two Euclidean distance
 transforms \citep{maurer2003} to be used for each subject.  One was
 calculated from the subject's own cerebral mask and the other was the 
 distance transform of the symmetric template cerebral mask warped
@@ -863,16 +865,16 @@ In summary, the proposed RF classification approach per subject consists of the
 following steps:
 
 \begin{enumerate}
-  \item Calculate stage 1 features based on:  
+  \item Calculate Stage 1 features based on:  
   \begin{itemize}
     \item GMM intensity modeling,
     \item asymmetry, and
     \item miscellaneous.
   \end{itemize}
-  \item Apply stage 1 RF model to the above calculated features resulting in seven 
+  \item Apply Stage 1 RF model to the above calculated features resulting in seven 
         probability maps for the seven tissue types.  
-  \item Use the probability maps to calculate stage 2 features based on MAP-MRF intensity modeling.
-  \item Apply stage 2 RF model to MAP-MRF, asymmetry, and miscellaneous features to 
+  \item Use the probability maps to calculate Stage 2 features based on MAP-MRF intensity modeling.
+  \item Apply Stage 2 RF model to MAP-MRF, asymmetry, and miscellaneous features to 
   get final RF classification. 
 \end{enumerate}
 
