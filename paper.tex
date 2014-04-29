@@ -178,19 +178,19 @@ Automated brain tumor segmentation in MRI is complicated by the lack
 of prior knowledge concerning tumor location, spatial extent, shape,
 possible displacement of normal tissue, and intensity signature.
 These factors limit the applicability of techniques with established
-performance in related tasks such as normal brain tissue segmentation.
-We introduce a template-based framework for computing geometric and
-asymmetry-driven feature sets from multiple modality neuroimaging.  We
-use these features to drive a supervised whole-brain and tumor segmentation
-approach based on random forests.  The asymmetry-related features 
+performance in related tasks such as normal brain tissue
+segmentation.  To alleviate the limitations of traditional tissue
+classification, we introduce a symmetric template-based framework for supervised
+segmentation based on multiple modality intensity, geometry and asymmetry feature sets.  These features drive a supervised whole-brain and tumor segmentation
+approach based on random forest-derived probabilities.  The
+asymmetry-related features, in particular, 
 demonstrate excellent discriminative properties within this framework. 
-This approach is made possible by symmetric multimodality brain templates which are optimal
-in terms of both shape and multivariate intensity.  Further
-performance improvements are demonstrated by a successive application
-of random forest models for increasing levels of feature refinement to
-which we refer as {\it concatenated random forests}.  Although the
-derived workflow involves many disparate components, the newly
-developed \textit{ANTsR} open source software package significantly facilitates
+We also gain performance by alternately generating
+probability maps from random forest models and feeding these maps 
+into Markov random field regularized probabilistic segmentation.  This
+strategy allows us to interface the supervised learning capabilities of the random forest
+model with regularized probabilistic segmentation.  The newly
+developed \textit{ANTsR} open source software package facilitates
 the proposed methodology.  \textit{ANTsR} is a comprehensive interface between the
 popular Advanced Normalization Tools (ANTs) and the \textit{R}
 statistical project. \textit{ANTsR} integrates proven image analysis methods
@@ -315,7 +315,7 @@ community of using RFs for handling complex
 classification/regression tasks including
 normal brain segmentation \citep{yi2009},
 MS lesion segmentation \cite{geremia2011}, 
-multimodal brain tumor segmentationp
+multimodal brain tumor segmentation
 \citep{bauer2012,zikic2012}, brain extraction \citep{iglesias2010}, 
 anatomy detection in computed tomography \citep{criminisi2013}, and
 segmentation of echocardiographic images \citep{verhoek2011}. 
