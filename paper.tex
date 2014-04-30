@@ -793,7 +793,8 @@ generated from the symmetric multivariate template
 described in the previous section and $\left\{F_i: i \in Misc\right\}$
 are miscellaneous feature images described in Section \ref{sec:misc}.
 Therefore, in total, the number of features is $k=84$ where there
-are twelve GMM features for each of the four modalities ($n=48$), 
+are twelve GMM features (7 posteriors plus 5 geometric features) for each 
+of the four modalities ($n=48$), 
 two asymmetry features for each modality ($n=8$), and six modality-specific 
 miscellaneous geometric features ($n=24$) with an additional four feature
 images.
@@ -823,7 +824,7 @@ symmetric templates.
 The second stage RF model is then produced similarly as the previous stage: 
 \begin{align}
 \label{eq:mapmrf}
-\mathrm{Tissue}\,\,\mathrm{classes} \sim \sum_{i \in MAP\_MRF} F_i + \sum_{i \in Asym} F_i + \sum_{i \in Misc} F_i,
+v_L \sim \sum_{i \in MAP\_MRF} F_i + \sum_{i \in Asym} F_i + \sum_{i \in Misc} F_i,
 \end{align}
 where $MAP-MRF$ represents the Stage 2 application of Atropos and the
 other features are similar to those used in Stage 1.
@@ -833,6 +834,13 @@ a spatial coherence constraint (the MRF prior) to those features
 in addition to 
 providing a better initialization with the RF posteriors from 
 the initial estimation stage (which lacked the MRF spatial prior).  
+In total, the number of features is for this final stage is also $k=84$ 
+where the GMM features are replaced by their MAP-MRF counterparts
+(7 posteriors plus 5 geometric features) for each of the four modalities ($n=48$).
+The rest of the feature images from the first stage
+(the two asymmetry features for each modality, six modality-specific 
+miscellaneous geometric features, and four miscellaneous feature
+images) are also included unaltered for this second stage.
 
 
 
