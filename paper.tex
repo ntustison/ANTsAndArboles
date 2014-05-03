@@ -368,13 +368,13 @@ in voxel-wise classification.  However, the RF outputs are not geometrically
 constrained, which is the motivation for our second refinement step.
 
 In line with our philosophy regarding open science \citep{tustison2013,ince2012}, 
-we have made the code available as open source%
+we have made the code available as open source
 %\footnote{
 %https://github.com/ntustison/BRATS2013
 %}
 and, to our knowledge, we are the only competitors out of the approximately 20 teams 
 that participated in either years' challenges to do this.  All code is based
-on the well-vetted and open source Insight Toolkit (ITK)%
+on the well-vetted and open source Insight Toolkit (ITK)
 %\footnote{
 %http://www.itk.org/
 %} 
@@ -1069,7 +1069,7 @@ Matlab.  Open source neuroimaging packages, such as NIPY (neuroimaging in Python
 %} 
 rely on other open source packages for numerical/statistical analysis.  NIPY,
 for example, uses the more generic packages NumPy and SciPy for numerical analysis and 
-optimization.%
+optimization.
 %\footnote{
 %http://www.numpy.org
 %}  
@@ -1088,7 +1088,7 @@ that robust statistical machinery was lacking for making inferences regarding
 the data produced during the course of ANTs processing.  \textit{ANTsR} was developed
 specifically to provide an interface between ANTs, a 
 powerful neuroimaging toolkit for producing reliable imaging data 
-transformations, and the \textit{R} project%
+transformations, and the \textit{R} project
 %\footnote{
 %http://www.r-project.org
 %}
@@ -1122,27 +1122,27 @@ The \textit{ANTsR} package is publicly available on the github project hosting s
 Prior to installation of \textit{ANTsR}, several external \textit{R} packages
 need to be installed including: \verb#Rcpp#, \verb#signal#, \verb#timeSeries#, 
 \verb#mFilter#, \verb#doParallel#, \verb#robust#, \verb#magic#, \verb#knitr#, \verb#pixmap#, 
-\verb#rgl#, and \verb#misc3d#.%  
+\verb#rgl#, and \verb#misc3d#.
 %\footnote{
 %See \href{http://stnava.github.io/software/2014/01/08/antsr/}{http://stnava.github.io/software/2014/01/08/antsr/} for current status.}
 Additionally, in order
 to perform the supervised brain segmentation as described 
 in later sections, one needs to also install the packages
 \verb#randomForest#, \verb#snowfall#, \verb#rlecuyer#,
-and \verb#ggplot2#.%
+and \verb#ggplot2#.
 %\footnote{
 %Packages are easily installed using the {\tt install.packages()} \textit{R} mechanism.
 %} 
 
 In addition to \textit{R} and the add-on packages previously mentioned, CMake is also 
-required.  CMake%
+required.  CMake
 %\footnote{
 %http://www.cmake.org/
 %}
 is an open source tool for the management and building of 
 large-scale software projects.  It is used
 to coordinate the downloading of external packages,
-such as the Insight Toolkit (ITK)%
+such as the Insight Toolkit (ITK)
 %\footnote{
 %http://www.itk.org/
 %}
@@ -1150,7 +1150,7 @@ and ANTs.  Further instructions for download and
 installation can be found on the \textit{ANTsR} github website.  Feel
 free to contact the authors if installation trouble occurs.  We note
 that \textit{ANTsR} is currently only tested on UNIX-alikes such OSX and Ubuntu
-operating systems.%  
+operating systems.
 %\footnote{Windows installation should be possible
 %but, to our knowledge, has not been attempted.}
 
@@ -1211,7 +1211,7 @@ including:
   in constructing the model.
 \end{itemize}
 We also include a fully functional 2-D example which performs
-both testing and training on sample challenge data.%
+both testing and training on sample challenge data.
 %\footnote{
 %https://github.com/ntustison/ANTsAndArboles/tree/master/SimpleExample
 %}
@@ -1222,7 +1222,7 @@ several overlap measures describing the performance.
 \subsection{Brain Tumor Data}
 
 Brain tumor image data used in this work were obtained from the NCI-MICCAI 2013 
-Challenge on Multimodal Brain Tumor Segmentation%
+Challenge on Multimodal Brain Tumor Segmentation
 %\footnote{
 %http://martinos.org/qtim/miccai2013/index.html
 %}
@@ -1243,7 +1243,7 @@ The former consisted of 21 and 4 high and low-grade tumor patients, respectively
 whereas the latter comprised 10 high-grade only patients.
 
 Manual labeling was performed in the axial plane following a detailed
-protocol.%
+protocol.
 %\footnote{
 %http://martinos.org/qtim/miccai2013/data.html
 %}
@@ -1283,7 +1283,7 @@ During model construction
 (specifically the out-of-bag error calculation stage), the decrease in prediction accuracy
 with the omission of a single feature or variable is tracked and averaged.  Thus,
 those features which have the greatest decrease in mean accuracy are considered
-to be the most discriminative.%
+to be the most discriminative.
 %\footnote{
 %There is an issue with consistently ranking correlated predictors as described at {\tt http://www.r-bloggers.com/random-forest-variable-importance/} since the permutation testing performed for predictive accuracy assessment assumes predictor independence.  Correctives have been proposed but we ignore these issues for this particular application.
 %}
@@ -1305,7 +1305,7 @@ to improve the final segmentation results such as removal of small connected
 components and morphological closure of certain regions.
 All steps are included in the script 
 {\tt applyTumorSegmentationModelForCohort.pl} designed for parallel subject 
-processing on the computational cluster at the University of Virginia.%
+processing on the computational cluster at the University of Virginia.
 %\footnote{
 %http://www.uvacse.edu
 %}
